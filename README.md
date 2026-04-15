@@ -115,6 +115,7 @@ Your app starts simple and scales only when you opt in. Every capability ships w
 
 Use the README as the landing page, then jump to the deeper guides:
 
+- **Best starting point**: begin with [Installation](docs/getting-started/installation.md), then follow the platform setup guide for the targets you ship.
 - **Getting started**: [Installation](docs/getting-started/installation.md), [Android setup](docs/getting-started/android-setup.md), [iOS setup](docs/getting-started/ios-setup.md), [macOS setup](docs/getting-started/macos-setup.md), [Desktop setup](docs/getting-started/desktop-setup.md), [Web setup](docs/getting-started/web-setup.md)
 - **Feature guides**: [Push notifications](docs/features/push-notifications.md), [In-app messaging](docs/features/in-app-messaging.md), [Notification inbox](docs/features/notification-inbox.md), [Scheduling](docs/features/scheduling.md), [Badges](docs/features/badges.md), [Quiet hours](docs/features/quiet-hours.md), [Diagnostics](docs/features/diagnostics.md), [Server recipes](docs/features/server-recipes.md)
 - **Backend payloads**: [Payload cookbook](#-payload-cookbook), [Server recipes](server_recipes/README.md)

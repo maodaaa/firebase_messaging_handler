@@ -27,15 +27,9 @@ class BadgeManager implements BadgeManagerInterface {
     // Web doesn't support app icon badges in the traditional sense
     if (isWeb) return false;
 
-    // iOS is supported via flutter_local_notifications
-    if (isIOS || isMacOS) return true;
-
-    // Android support is fragmented and depends on the launcher.
-    // We'll return true for now as we can at least track the count
-    // and attempt to set it via notifications.
-    if (isAndroid) return true;
-
-    return false;
+    // iOS/macOS are supported directly. Android support is launcher-dependent,
+    // but the plugin can still track badge counts and attempt to apply them.
+    return isIOS || isMacOS || isAndroid;
   }
 
   @override
