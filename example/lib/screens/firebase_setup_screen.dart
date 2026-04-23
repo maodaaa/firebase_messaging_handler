@@ -100,6 +100,39 @@ dependencies {
             _buildStepSection(
               context,
               stepNumber: 4,
+              title: 'Configure Web (VAPID Key)',
+              description: 'Required for browser push notifications',
+              children: [
+                _buildStepItem(
+                  'Open Firebase Console → Project Settings',
+                  'Select the Cloud Messaging tab',
+                  Icons.settings,
+                ),
+                _buildStepItem(
+                  'Scroll to "Web Push certificates"',
+                  'Under "Web configuration" section',
+                  Icons.web,
+                ),
+                _buildStepItem(
+                  'Generate or copy your Web Push key pair',
+                  'Click "Generate key pair" if none exists',
+                  Icons.key,
+                ),
+                _buildCodeBlock(
+                  '// Pass the Key Pair value as webVapidKey\n'
+                  'await FirebaseMessagingHandler.instance.init(\n'
+                  '  senderId: \'your_sender_id\',\n'
+                  '  webVapidKey: \'your_vapid_key_here\',\n'
+                  '  androidChannelList: [...],\n'
+                  '  androidNotificationIconPath: \'@drawable/ic_notification\',\n'
+                  ');',
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            _buildStepSection(
+              context,
+              stepNumber: 5,
               title: 'Configure iOS',
               description: 'Set up iOS configuration and APNS',
               children: [
@@ -128,7 +161,7 @@ dependencies {
             const SizedBox(height: 20),
             _buildStepSection(
               context,
-              stepNumber: 5,
+              stepNumber: 6,
               title: 'Enable Cloud Messaging',
               description: 'Activate Firebase Cloud Messaging',
               children: [

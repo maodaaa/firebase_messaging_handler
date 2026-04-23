@@ -2,9 +2,11 @@ import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_messaging_handler/firebase_messaging_handler.dart';
+import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 
+import '../firebase_options.dart';
 import '../providers/notification_provider.dart';
 import '../screens/scenario_screen.dart';
 
@@ -63,7 +65,11 @@ class FirebaseMessagingHandlerExampleService {
           ),
         ],
         androidNotificationIconPath: '@drawable/ic_notification',
-        senderId: '123456789012', // Replace with your actual sender ID
+        senderId: DefaultFirebaseOptions.currentPlatform.messagingSenderId,
+        // Web: pass your VAPID key from Firebase Console → Project Settings →
+        // Cloud Messaging → Web Push certificates → Key pair.
+        // null uses the project's default key pair (works for most setups).
+        webVapidKey: kIsWeb ? null : null,
         updateTokenCallback: (String fcmToken) async {
           debugPrint('FCM Token: $fcmToken');
           _notificationProvider.setFcmToken(fcmToken);

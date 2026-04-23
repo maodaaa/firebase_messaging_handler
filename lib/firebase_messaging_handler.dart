@@ -67,6 +67,7 @@ class FirebaseMessagingHandler {
     required final String senderId,
     required final List<NotificationChannelData> androidChannelList,
     required final String androidNotificationIconPath,
+    final String? webVapidKey,
     final Future<bool> Function(String fcmToken)? updateTokenCallback,
     final bool includeInitialNotificationInStream = true,
   }) async {
@@ -76,6 +77,7 @@ class FirebaseMessagingHandler {
       androidNotificationIconPath: androidNotificationIconPath,
       updateTokenCallback: updateTokenCallback,
       includeInitialNotificationInStream: includeInitialNotificationInStream,
+      webVapidKey: webVapidKey,
     );
   }
 
@@ -294,8 +296,7 @@ class FirebaseMessagingHandler {
 
   /// Constructs a [RemoteMessage] with the given fields, filling in sensible
   /// defaults for any omitted values. Useful for building synthetic payloads
-  /// in unit and integration tests without a real Firebase project.
-  @visibleForTesting
+  /// in tests and example apps without a real Firebase project.
   static RemoteMessage createMockRemoteMessage({
     String? messageId,
     String? title,
@@ -333,9 +334,8 @@ class FirebaseMessagingHandler {
     return RemoteMessage.fromMap(map);
   }
 
-  /// Constructs a [NotificationData] object suitable for use in tests.
-  /// Mirrors the shape of real click events emitted by the handler.
-  @visibleForTesting
+  /// Constructs a [NotificationData] object suitable for use in tests and
+  /// example apps. Mirrors the shape of real click events emitted by the handler.
   static NotificationData createMockNotificationData({
     Map<String, dynamic>? payload,
     String? title,

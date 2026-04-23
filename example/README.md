@@ -50,7 +50,15 @@ When you first run the app, you'll see a **Firebase Setup Screen** with step-by-
    - Place `GoogleService-Info.plist` in `ios/Runner/`
 
 4. **Update Firebase Options**:
-   - Run `flutterfire configure` or manually update `lib/firebase_options.dart`
+   - Run `flutterfire configure` or manually copy `lib/firebase_options.dart.example` → `lib/firebase_options.dart` and fill in your credentials
+
+5. **Web only — set up the service worker**:
+   - Copy `web/firebase-messaging-sw.js.example` → `web/firebase-messaging-sw.js`
+   - Fill in your Firebase project credentials inside that file
+   - Get your VAPID key from Firebase Console → Project Settings → Cloud Messaging → Web Push certificates
+   - Pass it to `init()` via `webVapidKey:` (see `lib/services/firebase_messaging_handler_example_service.dart`)
+
+> **Note:** `firebase_options.dart` and `firebase-messaging-sw.js` are gitignored — they contain credentials and must never be committed. The `.example` versions are safe templates with placeholder values.
 
 **The app will guide you through everything step-by-step!** 🎯
 
@@ -103,10 +111,7 @@ Find your project's **Sender ID** in:
 
 ### **3. Update Configuration**
 
-Update the sender ID in `lib/services/firebase_messaging_handler_example_service.dart`:
-```dart
-senderId: 'YOUR_SENDER_ID', // Replace with your actual sender ID
-```
+The sender ID is read automatically from `DefaultFirebaseOptions.currentPlatform.messagingSenderId` — no manual update needed once you have `firebase_options.dart` in place.
 
 ### **4. Run the Example**
 
@@ -225,30 +230,31 @@ The example demonstrates various configuration options:
 
 ```dart
 // Different notification channels
-NotificationChannelData(
+final channel = NotificationChannelData(
   id: 'default_channel',
   name: 'Default Notifications',
+  description: 'Default notification channel',
   importance: NotificationImportanceEnum.high,
   priority: NotificationPriorityEnum.high,
   playSound: true,
   enableVibration: true,
   enableLights: true,
-),
+);
 
 // Interactive actions
-NotificationAction(
+final action = NotificationAction(
   id: 'reply',
   title: 'Reply',
   payload: {'action': 'reply', 'user_id': 'user123'},
-),
+);
 
 // Scheduling options
-scheduleNotification(
+await FirebaseMessagingHandler.instance.scheduleNotification(
   id: 1,
   title: 'Meeting Reminder',
   body: 'Team meeting in 30 minutes',
   scheduledDate: DateTime.now().add(Duration(minutes: 30)),
-),
+);
 
 // Analytics tracking
 messagingHandler.setAnalyticsCallback((event, data) {

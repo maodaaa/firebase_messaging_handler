@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.4] - 2026-04-23
+
+### Fixed
+- **Web: `webVapidKey` parameter added to `init()`** — FCM token retrieval on web now works correctly. Pass your Firebase Web Push certificate key via `webVapidKey`; previously `senderId` was incorrectly forwarded as the VAPID key, causing token fetch to fail silently
+- **Web: binding crash on startup** — `FirebaseMessagingHandlerWeb.registerWith()` was touching `FirebaseMessagingHandler.instance` during plugin registration, before `WidgetsFlutterBinding` was initialized. This triggered `SharedPreferences.getInstance()` too early and threw a `DartError` on web. The premature singleton touch has been removed; the singleton initialises lazily when `init()` is called as intended
+- **Web: `firebase_core` added as explicit dependency** — the package now declares `firebase_core` directly instead of relying on it as a transitive dependency of `firebase_messaging`
+- **Web: actionable FCM token error logs** — `token-subscribe-failed` (missing Web Push certificate) and related errors now bail immediately without retrying and log exactly what is wrong and how to fix it, rather than silently retrying four times
+- **Web: Firebase app diagnostic log** — on web, `FCMService.initialize()` now logs the connected Firebase project ID, appId, and senderId so misconfiguration is immediately visible
+- **Example app: false "Firebase Not Configured" on web** — the setup check no longer attempts `getToken()` on web, so the example proceeds to the home screen as expected
+
+---
+
 ## [1.0.3] - 2026-03-08
 
 ### Added

@@ -1,6 +1,6 @@
 name: firebase_messaging_handler
 description: "Production-ready Firebase Cloud Messaging for Flutter with a unified click stream, notification inbox, in-app messaging, diagnostics, badges, and scheduling."
-version: 1.0.3
+version: 1.0.4
 homepage: https://qoder.in/resources/firebase-messaging-handler
 repository: https://github.com/qoder-official/firebase_messaging_handler
 issue_tracker: https://github.com/qoder-official/firebase_messaging_handler/issues
@@ -14,7 +14,8 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # Firebase Cloud Messaging
+  # Firebase core and Cloud Messaging
+  firebase_core: ">=3.0.0 <5.0.0"
   firebase_messaging: ">=16.0.4 <17.0.0"
   
   # Local notifications for scheduling and custom handling

@@ -32,6 +32,7 @@ build/
 /example/lib/firebase_options.dart
 /example/ios/Runner/GoogleService-Info.plist
 /example/macos/Runner/GoogleService-Info.plist
+/example/web/firebase-messaging-sw.js
 
 /.internal/
 

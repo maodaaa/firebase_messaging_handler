@@ -40,6 +40,17 @@ class FirebaseSetupService {
         '[FirebaseSetupService] Firebase Core initialized successfully',
       );
 
+      // On web, getToken() requires a VAPID key that is only known at
+      // FirebaseMessagingHandler.init() time. Firebase Core being available is
+      // sufficient to proceed; token retrieval happens later via init(webVapidKey:).
+      if (kIsWeb) {
+        _isConfigured = true;
+        debugPrint(
+          '[FirebaseSetupService] Web platform — skipping token check (VAPID key required)',
+        );
+        return true;
+      }
+
       // Check if Firebase Messaging is available
       final messaging = FirebaseMessaging.instance;
 

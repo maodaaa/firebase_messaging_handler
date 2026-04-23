@@ -70,6 +70,7 @@ class NotificationManager {
     required String androidNotificationIconPath,
     Future<bool> Function(String fcmToken)? updateTokenCallback,
     bool includeInitialNotificationInStream = true,
+    String? webVapidKey,
   }) async {
     try {
       // Initialize services
@@ -119,7 +120,7 @@ class NotificationManager {
       );
 
       // Handle FCM token
-      await _handleFCMToken(senderId, updateTokenCallback);
+      await _handleFCMToken(senderId, updateTokenCallback, webVapidKey: webVapidKey);
 
       if (updateTokenCallback != null) {
         _listenForTokenRefresh(updateTokenCallback);
@@ -875,11 +876,15 @@ class NotificationManager {
     }
   }
 
-  Future<void> _handleFCMToken(String senderId,
-      Future<bool> Function(String fcmToken)? updateTokenCallback) async {
+  Future<void> _handleFCMToken(
+    String senderId,
+    Future<bool> Function(String fcmToken)? updateTokenCallback, {
+    String? webVapidKey,
+  }) async {
     try {
-      final String? currentToken =
-          await _fcmService.getToken(vapidKey: senderId);
+      final String? currentToken = await _fcmService.getToken(
+        vapidKey: kIsWeb ? webVapidKey : null,
+      );
 
       if (currentToken == null) {
         _logMessage('[NotificationManager] Error fetching FCM Token!');

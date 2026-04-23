@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import '../interfaces/fcm_service_interface.dart';
@@ -52,6 +53,19 @@ class FCMService implements FCMServiceInterface {
       _firebaseMessaging = FirebaseMessaging.instance;
       _isInitialized = true;
       _logMessage('[FCMService] Initialized successfully');
+      if (kIsWeb) {
+        try {
+          final FirebaseApp app = Firebase.app();
+          _logMessage(
+            '[FCMService] Web Firebase app: project=${app.options.projectId} '
+            'appId=${app.options.appId} '
+            'senderId=${app.options.messagingSenderId}',
+          );
+        } catch (_) {
+          _logMessage('[FCMService] Web: could not read Firebase app options — '
+              'ensure Firebase.initializeApp() completed before init().');
+        }
+      }
       return true;
     } catch (error, stack) {
       _logMessage('[FCMService] Initialization error: $error');
@@ -128,6 +142,27 @@ class FCMService implements FCMServiceInterface {
         }
       } catch (error, stack) {
         _logMessage('[FCMService] Token retrieval attempt ${retryCount + 1} failed: $error');
+
+        // Web push subscription failed — retrying won't help, this is a project config issue.
+        if (kIsWeb) {
+          final String errorStr = error.toString().toLowerCase();
+          if (errorStr.contains('token-subscribe-failed') ||
+              errorStr.contains('invalid argument') ||
+              errorStr.contains('invalid-argument') ||
+              errorStr.contains('applicationserverkey')) {
+            const String reason =
+                'FCM token unavailable on web: Web Push subscription failed.\n'
+                '  Cause: no Web Push certificate key pair in your Firebase project, '
+                'or the provided VAPID key is invalid.\n'
+                '  Fix: Firebase Console → Project Settings → Cloud Messaging → '
+                'Web configuration → Generate key pair.\n'
+                '  Then pass the key pair value as webVapidKey to '
+                'FirebaseMessagingHandler.init(webVapidKey: \'<your key>\').';
+            _logMessage('[FCMService] $reason');
+            _lastTokenError = reason;
+            return null;
+          }
+        }
 
         // APNs token not set — retrying immediately won't help; surface a clear message.
         if (isIOS && error.toString().contains('apns-token-not-set')) {
