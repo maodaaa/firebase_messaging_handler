@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 @immutable
+
 /// Visual customization options for [NotificationInboxView].
 class NotificationInboxTheme {
   /// Creates a theme override for the inbox widget.

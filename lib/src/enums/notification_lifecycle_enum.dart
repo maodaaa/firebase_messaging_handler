@@ -5,4 +5,3 @@ enum NotificationLifecycle {
   resume,
   initial,
 }
-

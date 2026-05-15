@@ -9,13 +9,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [1.0.5] - 2026-05-16
+
 ### Added
 - `refreshLocalTimezone()` and `getConfiguredLocalTimezone()` on `FirebaseMessagingHandler.instance` for apps that reschedule reminders after app resume or timezone changes.
 - `configuredTimezone` metadata in `runDiagnostics()`.
 - `scheduleWeeklyNotification()` for recurring notifications on a specific weekday.
+- Swift Package Manager manifest at `ios/firebase_messaging_handler/Package.swift`, matching Flutter's current SPM package layout expectation.
+
+### Changed
+- Web/WASM analysis now uses a web-safe notification manager and foreground-options import path so the public web import graph no longer pulls in native local-notification implementations.
+- `NotificationChannelData` remains platform-neutral; Android conversion to `AndroidNotificationChannel` now lives in the Flutter local notifications extension layer.
+- iOS podspec version now matches the package release version.
 
 ### Fixed
 - Scheduled notifications now configure `tz.local` from the device timezone via `flutter_timezone` before calling `zonedSchedule`.
+- Pub platform scoring now reaches 160/160 locally: full platform support, WASM-ready status, Swift PM-ready status, clean static analysis, and current dependency support.
+
+### Verified
+- `flutter analyze`
+- `flutter test`
+- `flutter pub publish --dry-run`
+- `pana` package scoring with Flutter SDK: 160/160
+- Android device integration tests on `A015` / Android 16: `example/integration_test/comprehensive_test.dart` and `example/integration_test/real_push_test.dart`
 
 ---
 

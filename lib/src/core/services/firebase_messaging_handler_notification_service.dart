@@ -9,6 +9,7 @@ import '../utils/web_interop.dart' as web_interop;
 import '../interfaces/notification_service_interface.dart';
 import '../managers/notification_manager.dart';
 import '../../enums/export.dart';
+import '../../extensions/android_notification_channel_extensions.dart';
 import '../../constants/firebase_messaging_handler_constants.dart';
 import '../../models/export.dart';
 import '../utils/platform_utils.dart';

@@ -79,4 +79,3 @@ class BridgingPayloadValidator {
     return true;
   }
 }
-

@@ -32,8 +32,7 @@ Future<bool> requestWebNotificationPermission() async {
   try {
     final ctor = _notificationCtor;
     if (ctor == null) return false;
-    final perm =
-        ctor.getProperty<JSString?>('permission'.toJS)?.toDart;
+    final perm = ctor.getProperty<JSString?>('permission'.toJS)?.toDart;
     if (perm == 'granted') return true;
     if (perm == 'default') {
       final result = await ctor
@@ -54,8 +53,7 @@ Map<String, dynamic> getWebRuntimeDiagnostics() {
     final sw = nav.getProperty<JSObject?>('serviceWorker'.toJS);
     final swController = sw?.getProperty<JSObject?>('controller'.toJS);
     final ua = nav.getProperty<JSString?>('userAgent'.toJS)?.toDart;
-    final proto =
-        _location.getProperty<JSString?>('protocol'.toJS)?.toDart;
+    final proto = _location.getProperty<JSString?>('protocol'.toJS)?.toDart;
     final host = _location.getProperty<JSString?>('host'.toJS)?.toDart;
     return {
       'supported': notifAvailable,

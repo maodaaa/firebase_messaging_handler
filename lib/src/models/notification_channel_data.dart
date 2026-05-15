@@ -1,9 +1,7 @@
 import 'dart:typed_data';
 import 'dart:ui';
 import 'package:firebase_messaging_handler/src/enums/export.dart';
-import 'package:firebase_messaging_handler/src/extensions/export.dart';
-import 'package:firebase_messaging_handler/src/models/export.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:firebase_messaging_handler/src/models/notification_data.dart';
 
 /// Describes a notification channel and its defaults for Android delivery.
 class NotificationChannelData {
@@ -69,25 +67,4 @@ class NotificationChannelData {
       this.showBadge = true,
       this.priority = NotificationPriorityEnum.defaultPriority,
       this.actions});
-
-  /// Converts this model into the Android channel object expected by
-  /// `flutter_local_notifications`.
-  AndroidNotificationChannel toAndroidNotificationChannel() {
-    return AndroidNotificationChannel(
-      id,
-      name,
-      description: description,
-      groupId: groupId,
-      importance: importance.getConvertedImportance,
-      playSound: playSound,
-      sound: soundPath != null
-          ? RawResourceAndroidNotificationSound(soundPath)
-          : null,
-      enableVibration: enableVibration,
-      vibrationPattern: vibrationPattern,
-      showBadge: showBadge,
-      enableLights: enableLights,
-      ledColor: ledColor,
-    );
-  }
 }

@@ -38,6 +38,7 @@ class NotificationProvider extends ChangeNotifier {
   NotificationData? get initialNotification => _initialNotification;
   NotificationData? get activeNotification => _activeNotification;
   String? get fcmToken => _fcmToken;
+
   /// Human-readable reason the FCM token could not be retrieved, or null if it succeeded.
   String? get tokenError => _tokenError;
   bool get isInitialized => _isInitialized;

@@ -1,11 +1,15 @@
 import 'dart:async';
 import 'src/export.dart';
-import 'src/core/export.dart';
+import 'src/core/managers/notification_manager.dart';
+import 'src/core/services/permission_wizard_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
 export 'src/enums/export.dart';
 export 'src/models/export.dart';
-export 'src/core/export.dart';
+export 'src/core/managers/notification_manager.dart';
+export 'src/core/managers/in_app_message_manager.dart';
+export 'src/core/services/inbox_storage_service.dart';
+export 'src/core/interfaces/notification_inbox_storage_interface.dart';
 export 'src/core/utils/bridging_payload_validator.dart';
 export 'src/in_app/export.dart';
 export 'src/inbox/export.dart';

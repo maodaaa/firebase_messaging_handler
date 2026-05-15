@@ -141,7 +141,8 @@ class FCMService implements FCMServiceInterface {
           return token;
         }
       } catch (error, stack) {
-        _logMessage('[FCMService] Token retrieval attempt ${retryCount + 1} failed: $error');
+        _logMessage(
+            '[FCMService] Token retrieval attempt ${retryCount + 1} failed: $error');
 
         // Web push subscription failed — retrying won't help, this is a project config issue.
         if (kIsWeb) {
@@ -166,8 +167,7 @@ class FCMService implements FCMServiceInterface {
 
         // APNs token not set — retrying immediately won't help; surface a clear message.
         if (isIOS && error.toString().contains('apns-token-not-set')) {
-          const String reason =
-              'FCM token unavailable: APNs token not set. '
+          const String reason = 'FCM token unavailable: APNs token not set. '
               'Upload an APNs Authentication Key (.p8) to Firebase Console → '
               'Project Settings → Cloud Messaging → iOS app → APNs Authentication Key. '
               'This is required on real iOS devices; simulators cannot receive APNs tokens.';
@@ -177,14 +177,16 @@ class FCMService implements FCMServiceInterface {
         }
 
         if (retryCount == maxRetries) {
-          _logMessage('[FCMService] Token retrieval failed after $maxRetries retries.');
+          _logMessage(
+              '[FCMService] Token retrieval failed after $maxRetries retries.');
           _logMessage('[FCMService] Stack trace: $stack');
           return null;
         }
 
         // Exponential backoff: 1s, 2s, 4s
         final int delaySeconds = 1 << retryCount;
-        _logMessage('[FCMService] Retrying token retrieval in ${delaySeconds}s...');
+        _logMessage(
+            '[FCMService] Retrying token retrieval in ${delaySeconds}s...');
         await Future.delayed(Duration(seconds: delaySeconds));
         retryCount++;
       }
@@ -319,25 +321,22 @@ class FCMService implements FCMServiceInterface {
   }
 
   @override
-  Stream<RemoteMessage> get onMessage =>
-      isSupportedOnCurrentPlatform
-          ? FirebaseMessaging.onMessage
-          : const Stream<RemoteMessage>.empty();
+  Stream<RemoteMessage> get onMessage => isSupportedOnCurrentPlatform
+      ? FirebaseMessaging.onMessage
+      : const Stream<RemoteMessage>.empty();
 
   @override
-  Stream<RemoteMessage> get onMessageOpenedApp =>
-      isSupportedOnCurrentPlatform
-          ? FirebaseMessaging.onMessageOpenedApp
-          : const Stream<RemoteMessage>.empty();
+  Stream<RemoteMessage> get onMessageOpenedApp => isSupportedOnCurrentPlatform
+      ? FirebaseMessaging.onMessageOpenedApp
+      : const Stream<RemoteMessage>.empty();
 
   @override
   Stream<RemoteMessage> get onBackgroundMessage => const Stream.empty();
 
   @override
-  Stream<String> get onTokenRefresh =>
-      isSupportedOnCurrentPlatform
-          ? FirebaseMessaging.instance.onTokenRefresh
-          : const Stream<String>.empty();
+  Stream<String> get onTokenRefresh => isSupportedOnCurrentPlatform
+      ? FirebaseMessaging.instance.onTokenRefresh
+      : const Stream<String>.empty();
 
   @override
   Future<NotificationSettings> getNotificationSettings() async {

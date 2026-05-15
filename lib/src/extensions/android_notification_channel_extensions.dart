@@ -1,7 +1,34 @@
 import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:firebase_messaging_handler/src/models/notification_channel_data.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+import '../extensions/notification_importance_enum_extensions.dart';
+
+extension NotificationChannelDataFlutterLocalNotifications
+    on NotificationChannelData {
+  /// Converts this model into the Android channel object expected by
+  /// `flutter_local_notifications`.
+  AndroidNotificationChannel toAndroidNotificationChannel() {
+    return AndroidNotificationChannel(
+      id,
+      name,
+      description: description,
+      groupId: groupId,
+      importance: importance.getConvertedImportance,
+      playSound: playSound,
+      sound: soundPath != null
+          ? RawResourceAndroidNotificationSound(soundPath)
+          : null,
+      enableVibration: enableVibration,
+      vibrationPattern: vibrationPattern,
+      showBadge: showBadge,
+      enableLights: enableLights,
+      ledColor: ledColor,
+    );
+  }
+}
 
 extension AndroidNotificationChannelCopyWith on AndroidNotificationChannel {
   AndroidNotificationChannel copyWith({

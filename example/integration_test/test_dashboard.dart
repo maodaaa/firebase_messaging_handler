@@ -60,8 +60,7 @@ class TestSuite extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<String> get categories =>
-      _cases.map((c) => c.category).toSet().toList();
+  List<String> get categories => _cases.map((c) => c.category).toSet().toList();
 
   List<TestCase> byCategory(String category) =>
       _cases.where((c) => c.category == category).toList();
@@ -205,8 +204,9 @@ class _SummaryBar extends StatelessWidget {
                   Icon(
                     allPassed ? Icons.check_circle : Icons.error,
                     size: 16,
-                    color:
-                        allPassed ? const Color(0xFF3FB950) : const Color(0xFFF85149),
+                    color: allPassed
+                        ? const Color(0xFF3FB950)
+                        : const Color(0xFFF85149),
                   ),
               ],
             ),
@@ -456,8 +456,7 @@ class _StatusIcon extends StatelessWidget {
           ),
         );
       case TestStatus.skipped:
-        return const Icon(Icons.skip_next,
-            size: 16, color: Color(0xFFD29922));
+        return const Icon(Icons.skip_next, size: 16, color: Color(0xFFD29922));
       case TestStatus.pending:
         return const Icon(Icons.radio_button_unchecked,
             size: 16, color: Color(0xFF30363D));

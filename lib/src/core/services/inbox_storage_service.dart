@@ -76,9 +76,8 @@ class InboxStorageService implements NotificationInboxStorageInterface {
     final List<NotificationInboxItem> items = await _readAll();
     final Set<String> targetIds = ids.toSet();
     final List<NotificationInboxItem> updated = items
-        .map((NotificationInboxItem item) => targetIds.contains(item.id)
-            ? item.copyWith(isRead: isRead)
-            : item)
+        .map((NotificationInboxItem item) =>
+            targetIds.contains(item.id) ? item.copyWith(isRead: isRead) : item)
         .toList();
     await _writeAll(updated);
   }
@@ -232,4 +231,3 @@ class InMemoryInboxStorage implements NotificationInboxStorageInterface {
     return _items.where((NotificationInboxItem item) => !item.isRead).length;
   }
 }
-

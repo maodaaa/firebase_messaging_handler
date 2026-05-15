@@ -22,9 +22,9 @@ import 'fcm_test_sender.dart';
 ///   BASE64=$(base64 -i ../test/firebase_config/service_account.json | tr -d '\n')
 ///
 ///   flutter test integration_test/real_push_test.dart \
-///     --dart-define=FCM_TEST_SENDER_ID=<your-project-number> \
+///     --dart-define=FCM_TEST_SENDER_ID=your-project-number \
 ///     --dart-define=FCM_SERVICE_ACCOUNT_B64=$BASE64 \
-///     --device-id <your-device-id>
+///     --device-id your-device-id
 ///
 /// Without FCM_SERVICE_ACCOUNT_B64 all send-dependent tests SKIP (not fail),
 /// so CI without credentials stays green.
@@ -150,8 +150,7 @@ void main() {
       await sender!.send(
         deviceToken: deviceToken!,
         title: 'Integration Test',
-        body:
-            'Tap this — ts=${DateTime.now().millisecondsSinceEpoch}',
+        body: 'Tap this — ts=${DateTime.now().millisecondsSinceEpoch}',
       );
       print('[real_push] ✓ FCM send returned 200');
 
@@ -197,8 +196,7 @@ void main() {
         sender!.send(
           deviceToken: deviceToken!,
           data: {
-            'fcmh_inapp':
-                '{"template":"builtin_generic","type":"dialog",'
+            'fcmh_inapp': '{"template":"builtin_generic","type":"dialog",'
                 '"title":"Integration Test","body":"Data-only payload ok"}',
           },
         ),

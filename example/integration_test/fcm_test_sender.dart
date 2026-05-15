@@ -41,8 +41,7 @@ class FcmTestSender {
     try {
       final json = utf8.decode(base64Decode(_encodedSa));
       final sa = jsonDecode(json) as Map<String, dynamic>;
-      return FcmTestSender._(
-          projectId: sa['project_id'] as String, sa: sa);
+      return FcmTestSender._(projectId: sa['project_id'] as String, sa: sa);
     } catch (_) {
       return null;
     }

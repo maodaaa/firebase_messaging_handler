@@ -217,7 +217,8 @@ class _HomeScreenState extends State<HomeScreen> {
         } catch (e) {
           debugPrint('[HomeScreen] Error fetching FCM token: $e');
           if (mounted) {
-            provider.setFcmToken(null, error: 'Unexpected error fetching token: $e');
+            provider.setFcmToken(null,
+                error: 'Unexpected error fetching token: $e');
           }
         }
       }
@@ -271,9 +272,10 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context) {
         final theme = Theme.of(context);
         final metadata = result.metadata;
-        final webDiagnostics = metadata['webDiagnostics'] is Map<String, dynamic>
-            ? metadata['webDiagnostics'] as Map<String, dynamic>
-            : null;
+        final webDiagnostics =
+            metadata['webDiagnostics'] is Map<String, dynamic>
+                ? metadata['webDiagnostics'] as Map<String, dynamic>
+                : null;
 
         final entries = [
           _buildDiagnosticsRow(
@@ -303,8 +305,8 @@ class _HomeScreenState extends State<HomeScreen> {
             metadata['fcmSupported'] == false
                 ? 'FCM background handling is unavailable on ${result.platform}'
                 : metadata['backgroundHandlerRegistered'] == true
-                ? 'Registered via configureBackgroundMessageHandler'
-                : 'No background handler registered',
+                    ? 'Registered via configureBackgroundMessageHandler'
+                    : 'No background handler registered',
             metadata['fcmSupported'] == false ||
                 metadata['backgroundHandlerRegistered'] == true,
           ),
@@ -468,342 +470,347 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 20),
                     _buildStatusStrip(provider),
                     const SizedBox(height: 28),
-                if (provider.fcmToken != null) ...[
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: FilledButton.icon(
-                      onPressed: () =>
-                          _copyFcmToken(context, provider.fcmToken),
-                      icon: const Icon(Icons.copy),
-                      label: const Text('Copy FCM token'),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
+                    if (provider.fcmToken != null) ...[
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: FilledButton.icon(
+                          onPressed: () =>
+                              _copyFcmToken(context, provider.fcmToken),
+                          icon: const Icon(Icons.copy),
+                          label: const Text('Copy FCM token'),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
                     _buildFeatureSection(
                       title: 'Quick Start Scenarios',
-                      subtitle: 'Run these to validate setup in under a minute.',
+                      subtitle:
+                          'Run these to validate setup in under a minute.',
                       features: [
                         FeatureCard(
-                      title: 'Send Interactive Push',
-                      description:
-                          'Triggers a foreground notification with action buttons.',
-                      icon: Icons.send,
-                      color: Colors.blue,
-                      onTap: _notificationService.sendTestNotification,
-                      onInfoTap: () => _showFeatureInfo(
-                        context,
-                        title: 'Send Interactive Push',
-                        body:
-                            'Calls FirebaseMessagingHandler.showNotificationWithActions with a demo payload '
-                            'to demonstrate interactive notifications and analytics events.',
-                      ),
-                    ),
-                    FeatureCard(
-                      title: 'Schedule in 60 Seconds',
-                      description:
-                          'Demonstrates time-based delivery with analytics hooks.',
-                      icon: Icons.schedule_send,
-                      color: Colors.green,
-                      onTap: _notificationService.scheduleTestNotification,
-                      onInfoTap: () => _showFeatureInfo(
-                        context,
-                        title: 'Schedule Notification',
-                        body:
-                            'Uses FirebaseMessagingHandler.scheduleNotification with a DateTime 60 seconds in the future. '
-                            'We automatically manage timezone-safe delivery via flutter_local_notifications.',
-                      ),
-                    ),
-                    FeatureCard(
-                      title: 'Daily Reminder Demo',
-                      description:
-                          'Configures a recurring daily notification at 09:00.',
-                      icon: Icons.repeat,
-                      color: Colors.orange,
-                      onTap: _notificationService.scheduleRecurringNotification,
-                      onInfoTap: () => _showFeatureInfo(
-                        context,
-                        title: 'Recurring Notification',
-                        body:
-                            'Wraps scheduleRecurringNotification with daily cadence. The handler persists the cadence '
-                            'and analytics logs each repetition under notification_scheduled.',
-                      ),
-                    ),
-                    FeatureCard(
-                      title: 'Grouped Inbox',
-                      description:
-                          'Creates an Android notification group with three messages.',
-                      icon: Icons.group_work,
-                      color: Colors.purple,
-                      onTap: _notificationService.createNotificationGroup,
-                      onInfoTap: () => _showFeatureInfo(
-                        context,
-                        title: 'Notification Groups',
-                        body:
-                            'Calls createNotificationGroup with three NotificationData instances so you can inspect '
-                            'group summaries and taps inside the Scenario screen.',
-                      ),
-                    ),
-                    FeatureCard(
-                      title: 'Data-Only Bridge',
-                      description:
-                          'Converts a data-only payload into a local notification using the bridge.',
-                      icon: Icons.wifi_tethering,
-                      color: Colors.indigo,
-                      onTap: _notificationService.triggerDataOnlyBridge,
-                      onInfoTap: () => _showFeatureInfo(
-                        context,
-                        title: 'Data-Only Bridge',
-                        body:
-                            'Invokes enableDefaultDataOnlyBridge and simulates a background data payload. The handler '
-                            'promotes it into a local notification so users still see a banner.',
-                      ),
-                    ),
-                    FeatureCard(
-                      title: 'Inbox Widget Demo',
-                      description:
-                          'Opens a storage-backed inbox with swipe-to-delete and theming.',
-                      icon: Icons.inbox_outlined,
-                      color: Colors.deepPurple,
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const InboxScreen(),
+                          title: 'Send Interactive Push',
+                          description:
+                              'Triggers a foreground notification with action buttons.',
+                          icon: Icons.send,
+                          color: Colors.blue,
+                          onTap: _notificationService.sendTestNotification,
+                          onInfoTap: () => _showFeatureInfo(
+                            context,
+                            title: 'Send Interactive Push',
+                            body:
+                                'Calls FirebaseMessagingHandler.showNotificationWithActions with a demo payload '
+                                'to demonstrate interactive notifications and analytics events.',
                           ),
-                        );
-                      },
-                      onInfoTap: () => _showFeatureInfo(
-                        context,
-                        title: 'Inbox Widget Demo',
-                        body:
-                            'Shows NotificationInboxView backed by InboxStorageService with mark-as-read, delete, and theming knobs.',
-                      ),
-                    ),
-                    FeatureCard(
-                      title: 'Notification Doctor',
-                      description: _diagnosticsLoading
-                          ? 'Running environment checks...'
-                          : _latestDiagnostics == null
-                              ? 'Runs diagnostics for permissions, token, badges & web capabilities.'
-                              : _latestDiagnostics!.recommendations.isEmpty
-                                  ? 'Last run: All systems look good.'
-                                  : 'Last run highlighted ${_latestDiagnostics!.recommendations.length} improvement(s).',
-                      icon: Icons.medical_information,
-                      color: Colors.teal,
-                      onTap: _diagnosticsLoading ? null : _runDiagnostics,
-                      onInfoTap: () => _showFeatureInfo(
-                        context,
-                        title: 'Notification Doctor',
-                        body:
-                            'Invokes FirebaseMessagingHandler.runDiagnostics to verify permissions, tokens, badges, '
-                            'web capabilities, and background handler wiring. Helpful when validating production builds.',
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 32),
-                _buildFeatureSection(
-                  title: 'In-App Notification Templates',
-                  subtitle:
-                      'Trigger custom in-app templates with different styles.',
-                  features: [
-                    FeatureCard(
-                      title: 'Welcome Template',
-                      description:
-                          'Shows a welcome banner with onboarding content.',
-                      icon: Icons.waving_hand,
-                      color: Colors.green,
-                      onTap: _notificationService.triggerWelcomeTemplate,
-                      onInfoTap: () => _showFeatureInfo(
-                        context,
-                        title: 'Welcome Template',
-                        body:
-                            'Triggers an in-app welcome template that can be used for onboarding flows and user greetings.',
-                      ),
-                    ),
-                    FeatureCard(
-                      title: 'Promotion Template',
-                      description:
-                          'Displays promotional content with call-to-action.',
-                      icon: Icons.local_offer,
-                      color: Colors.orange,
-                      onTap: _notificationService.triggerPromotionTemplate,
-                      onInfoTap: () => _showFeatureInfo(
-                        context,
-                        title: 'Promotion Template',
-                        body:
-                            'Shows promotional banners with special offers and discount codes for marketing campaigns.',
-                      ),
-                    ),
-                    FeatureCard(
-                      title: 'Alert Template',
-                      description:
-                          'Highlights important alerts and urgent messages.',
-                      icon: Icons.warning,
-                      color: Colors.red,
-                      onTap: _notificationService.triggerAlertTemplate,
-                      onInfoTap: () => _showFeatureInfo(
-                        context,
-                        title: 'Alert Template',
-                        body:
-                            'Displays urgent alerts and important notifications that require immediate attention.',
-                      ),
-                    ),
-                    FeatureCard(
-                      title: 'Success Template',
-                      description:
-                          'Celebrates successful actions and confirmations.',
-                      icon: Icons.check_circle,
-                      color: Colors.lightGreen,
-                      onTap: _notificationService.triggerSuccessTemplate,
-                      onInfoTap: () => _showFeatureInfo(
-                        context,
-                        title: 'Success Template',
-                        body:
-                            'Shows success messages and confirmation banners for completed actions.',
-                      ),
-                    ),
-                    FeatureCard(
-                      title: 'Info Template',
-                      description:
-                          'Provides helpful tips and informational content.',
-                      icon: Icons.info,
-                      color: Colors.blue,
-                      onTap: _notificationService.triggerInfoTemplate,
-                      onInfoTap: () => _showFeatureInfo(
-                        context,
-                        title: 'Info Template',
-                        body:
-                            'Displays informational content, tips, and helpful guidance for users.',
-                      ),
-                    ),
-                    FeatureCard(
-                      title: 'Feature Announcement',
-                      description:
-                          'Announce new features and capabilities to users.',
-                      icon: Icons.new_releases,
-                      color: Colors.green,
-                      onTap:
-                          _notificationService.triggerFeatureAnnouncementDemo,
-                      onInfoTap: () => _showFeatureInfo(
-                        context,
-                        title: 'Feature Announcement Template',
-                        body:
-                            'Perfect for announcing new features, capabilities, or improvements. Uses a dialog layout with customizable content.',
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 32),
-                _buildFeatureSection(
-                  title: 'Power Features & Utilities',
-                  subtitle: 'Fine tune presentation, badges and sound.',
-                  features: [
-                    FeatureCard(
-                      title: 'Update Badges',
-                      description:
-                          'Sync iOS + Android badge counts to show parity.',
-                      icon: Icons.confirmation_num,
-                      color: Colors.teal,
-                      onTap: _notificationService.updateBadges,
-                      onInfoTap: () => _showFeatureInfo(
-                        context,
-                        title: 'Badge Management',
-                        body:
-                            'Invokes setIOSBadgeCount and setAndroidBadgeCount through the handler and mirrors the '
-                            'state in the provider so you can observe how parity is achieved.',
-                      ),
-                    ),
-                    FeatureCard(
-                      title: 'User Feedback',
-                      description:
-                          'Collect user feedback and ratings through interactive templates.',
-                      icon: Icons.feedback,
-                      color: Colors.orange,
-                      onTap: _notificationService.triggerUserFeedbackDemo,
-                      onInfoTap: () => _showFeatureInfo(
-                        context,
-                        title: 'User Feedback Template',
-                        body:
-                            'Collect user feedback, ratings, and suggestions through interactive bottom sheet templates. '
-                            'Perfect for understanding user satisfaction and gathering insights.',
-                      ),
-                    ),
-                    FeatureCard(
-                      title: 'Custom Sound Channel',
-                      description:
-                          'Build and register a sound-enabled notification channel.',
-                      icon: Icons.music_note,
-                      color: Colors.pink,
-                      onTap: () async {
-                        final notificationProvider =
-                            Provider.of<NotificationProvider>(
-                          context,
-                          listen: false,
-                        );
-                        final messenger = ScaffoldMessenger.of(context);
-                        await _notificationService.messagingHandler
-                            .createCustomSoundChannel(
-                          channelId: 'music_channel',
-                          channelName: 'Music Notifications',
-                          channelDescription: 'Notifications with custom sound',
-                          soundFileName: 'default',
-                          importance: NotificationImportanceEnum.high,
-                          priority: NotificationPriorityEnum.high,
-                        );
-                        if (!mounted) return;
-                        messenger.showSnackBar(
-                          const SnackBar(
-                            content: Text('Custom sound channel registered.'),
+                        ),
+                        FeatureCard(
+                          title: 'Schedule in 60 Seconds',
+                          description:
+                              'Demonstrates time-based delivery with analytics hooks.',
+                          icon: Icons.schedule_send,
+                          color: Colors.green,
+                          onTap: _notificationService.scheduleTestNotification,
+                          onInfoTap: () => _showFeatureInfo(
+                            context,
+                            title: 'Schedule Notification',
+                            body:
+                                'Uses FirebaseMessagingHandler.scheduleNotification with a DateTime 60 seconds in the future. '
+                                'We automatically manage timezone-safe delivery via flutter_local_notifications.',
                           ),
-                        );
-                        notificationProvider.addActivity(
-                          'Registered custom sound channel',
-                        );
-                      },
-                      onInfoTap: () => _showFeatureInfo(
-                        context,
-                        title: 'Custom Sounds',
-                        body:
-                            'Demonstrates createCustomSoundChannel to provision an Android channel with explicit sound, '
-                            'importance and vibration configuration.',
-                      ),
+                        ),
+                        FeatureCard(
+                          title: 'Daily Reminder Demo',
+                          description:
+                              'Configures a recurring daily notification at 09:00.',
+                          icon: Icons.repeat,
+                          color: Colors.orange,
+                          onTap: _notificationService
+                              .scheduleRecurringNotification,
+                          onInfoTap: () => _showFeatureInfo(
+                            context,
+                            title: 'Recurring Notification',
+                            body:
+                                'Wraps scheduleRecurringNotification with daily cadence. The handler persists the cadence '
+                                'and analytics logs each repetition under notification_scheduled.',
+                          ),
+                        ),
+                        FeatureCard(
+                          title: 'Grouped Inbox',
+                          description:
+                              'Creates an Android notification group with three messages.',
+                          icon: Icons.group_work,
+                          color: Colors.purple,
+                          onTap: _notificationService.createNotificationGroup,
+                          onInfoTap: () => _showFeatureInfo(
+                            context,
+                            title: 'Notification Groups',
+                            body:
+                                'Calls createNotificationGroup with three NotificationData instances so you can inspect '
+                                'group summaries and taps inside the Scenario screen.',
+                          ),
+                        ),
+                        FeatureCard(
+                          title: 'Data-Only Bridge',
+                          description:
+                              'Converts a data-only payload into a local notification using the bridge.',
+                          icon: Icons.wifi_tethering,
+                          color: Colors.indigo,
+                          onTap: _notificationService.triggerDataOnlyBridge,
+                          onInfoTap: () => _showFeatureInfo(
+                            context,
+                            title: 'Data-Only Bridge',
+                            body:
+                                'Invokes enableDefaultDataOnlyBridge and simulates a background data payload. The handler '
+                                'promotes it into a local notification so users still see a banner.',
+                          ),
+                        ),
+                        FeatureCard(
+                          title: 'Inbox Widget Demo',
+                          description:
+                              'Opens a storage-backed inbox with swipe-to-delete and theming.',
+                          icon: Icons.inbox_outlined,
+                          color: Colors.deepPurple,
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const InboxScreen(),
+                              ),
+                            );
+                          },
+                          onInfoTap: () => _showFeatureInfo(
+                            context,
+                            title: 'Inbox Widget Demo',
+                            body:
+                                'Shows NotificationInboxView backed by InboxStorageService with mark-as-read, delete, and theming knobs.',
+                          ),
+                        ),
+                        FeatureCard(
+                          title: 'Notification Doctor',
+                          description: _diagnosticsLoading
+                              ? 'Running environment checks...'
+                              : _latestDiagnostics == null
+                                  ? 'Runs diagnostics for permissions, token, badges & web capabilities.'
+                                  : _latestDiagnostics!.recommendations.isEmpty
+                                      ? 'Last run: All systems look good.'
+                                      : 'Last run highlighted ${_latestDiagnostics!.recommendations.length} improvement(s).',
+                          icon: Icons.medical_information,
+                          color: Colors.teal,
+                          onTap: _diagnosticsLoading ? null : _runDiagnostics,
+                          onInfoTap: () => _showFeatureInfo(
+                            context,
+                            title: 'Notification Doctor',
+                            body:
+                                'Invokes FirebaseMessagingHandler.runDiagnostics to verify permissions, tokens, badges, '
+                                'web capabilities, and background handler wiring. Helpful when validating production builds.',
+                          ),
+                        ),
+                      ],
                     ),
-                    FeatureCard(
-                      title: 'Clear Demo State',
-                      description:
-                          'Reset scheduled notifications, badges and timeline.',
-                      icon: Icons.delete_sweep,
-                      color: Colors.redAccent,
-                      onTap: () async {
-                        final messenger = ScaffoldMessenger.of(context);
-                        await _notificationService.clearAllNotifications();
-                        if (!mounted) return;
-                        messenger.showSnackBar(
-                          const SnackBar(content: Text('Demo state cleared.')),
-                        );
-                      },
-                      onInfoTap: () => _showFeatureInfo(
-                        context,
-                        title: 'Clear Demo State',
-                        body:
-                            'Cancels scheduled notifications, resets badges, clears local history and activity logs to give '
-                            'you a fresh testing slate.',
-                      ),
+                    const SizedBox(height: 32),
+                    _buildFeatureSection(
+                      title: 'In-App Notification Templates',
+                      subtitle:
+                          'Trigger custom in-app templates with different styles.',
+                      features: [
+                        FeatureCard(
+                          title: 'Welcome Template',
+                          description:
+                              'Shows a welcome banner with onboarding content.',
+                          icon: Icons.waving_hand,
+                          color: Colors.green,
+                          onTap: _notificationService.triggerWelcomeTemplate,
+                          onInfoTap: () => _showFeatureInfo(
+                            context,
+                            title: 'Welcome Template',
+                            body:
+                                'Triggers an in-app welcome template that can be used for onboarding flows and user greetings.',
+                          ),
+                        ),
+                        FeatureCard(
+                          title: 'Promotion Template',
+                          description:
+                              'Displays promotional content with call-to-action.',
+                          icon: Icons.local_offer,
+                          color: Colors.orange,
+                          onTap: _notificationService.triggerPromotionTemplate,
+                          onInfoTap: () => _showFeatureInfo(
+                            context,
+                            title: 'Promotion Template',
+                            body:
+                                'Shows promotional banners with special offers and discount codes for marketing campaigns.',
+                          ),
+                        ),
+                        FeatureCard(
+                          title: 'Alert Template',
+                          description:
+                              'Highlights important alerts and urgent messages.',
+                          icon: Icons.warning,
+                          color: Colors.red,
+                          onTap: _notificationService.triggerAlertTemplate,
+                          onInfoTap: () => _showFeatureInfo(
+                            context,
+                            title: 'Alert Template',
+                            body:
+                                'Displays urgent alerts and important notifications that require immediate attention.',
+                          ),
+                        ),
+                        FeatureCard(
+                          title: 'Success Template',
+                          description:
+                              'Celebrates successful actions and confirmations.',
+                          icon: Icons.check_circle,
+                          color: Colors.lightGreen,
+                          onTap: _notificationService.triggerSuccessTemplate,
+                          onInfoTap: () => _showFeatureInfo(
+                            context,
+                            title: 'Success Template',
+                            body:
+                                'Shows success messages and confirmation banners for completed actions.',
+                          ),
+                        ),
+                        FeatureCard(
+                          title: 'Info Template',
+                          description:
+                              'Provides helpful tips and informational content.',
+                          icon: Icons.info,
+                          color: Colors.blue,
+                          onTap: _notificationService.triggerInfoTemplate,
+                          onInfoTap: () => _showFeatureInfo(
+                            context,
+                            title: 'Info Template',
+                            body:
+                                'Displays informational content, tips, and helpful guidance for users.',
+                          ),
+                        ),
+                        FeatureCard(
+                          title: 'Feature Announcement',
+                          description:
+                              'Announce new features and capabilities to users.',
+                          icon: Icons.new_releases,
+                          color: Colors.green,
+                          onTap: _notificationService
+                              .triggerFeatureAnnouncementDemo,
+                          onInfoTap: () => _showFeatureInfo(
+                            context,
+                            title: 'Feature Announcement Template',
+                            body:
+                                'Perfect for announcing new features, capabilities, or improvements. Uses a dialog layout with customizable content.',
+                          ),
+                        ),
+                      ],
                     ),
+                    const SizedBox(height: 32),
+                    _buildFeatureSection(
+                      title: 'Power Features & Utilities',
+                      subtitle: 'Fine tune presentation, badges and sound.',
+                      features: [
+                        FeatureCard(
+                          title: 'Update Badges',
+                          description:
+                              'Sync iOS + Android badge counts to show parity.',
+                          icon: Icons.confirmation_num,
+                          color: Colors.teal,
+                          onTap: _notificationService.updateBadges,
+                          onInfoTap: () => _showFeatureInfo(
+                            context,
+                            title: 'Badge Management',
+                            body:
+                                'Invokes setIOSBadgeCount and setAndroidBadgeCount through the handler and mirrors the '
+                                'state in the provider so you can observe how parity is achieved.',
+                          ),
+                        ),
+                        FeatureCard(
+                          title: 'User Feedback',
+                          description:
+                              'Collect user feedback and ratings through interactive templates.',
+                          icon: Icons.feedback,
+                          color: Colors.orange,
+                          onTap: _notificationService.triggerUserFeedbackDemo,
+                          onInfoTap: () => _showFeatureInfo(
+                            context,
+                            title: 'User Feedback Template',
+                            body:
+                                'Collect user feedback, ratings, and suggestions through interactive bottom sheet templates. '
+                                'Perfect for understanding user satisfaction and gathering insights.',
+                          ),
+                        ),
+                        FeatureCard(
+                          title: 'Custom Sound Channel',
+                          description:
+                              'Build and register a sound-enabled notification channel.',
+                          icon: Icons.music_note,
+                          color: Colors.pink,
+                          onTap: () async {
+                            final notificationProvider =
+                                Provider.of<NotificationProvider>(
+                              context,
+                              listen: false,
+                            );
+                            final messenger = ScaffoldMessenger.of(context);
+                            await _notificationService.messagingHandler
+                                .createCustomSoundChannel(
+                              channelId: 'music_channel',
+                              channelName: 'Music Notifications',
+                              channelDescription:
+                                  'Notifications with custom sound',
+                              soundFileName: 'default',
+                              importance: NotificationImportanceEnum.high,
+                              priority: NotificationPriorityEnum.high,
+                            );
+                            if (!mounted) return;
+                            messenger.showSnackBar(
+                              const SnackBar(
+                                content:
+                                    Text('Custom sound channel registered.'),
+                              ),
+                            );
+                            notificationProvider.addActivity(
+                              'Registered custom sound channel',
+                            );
+                          },
+                          onInfoTap: () => _showFeatureInfo(
+                            context,
+                            title: 'Custom Sounds',
+                            body:
+                                'Demonstrates createCustomSoundChannel to provision an Android channel with explicit sound, '
+                                'importance and vibration configuration.',
+                          ),
+                        ),
+                        FeatureCard(
+                          title: 'Clear Demo State',
+                          description:
+                              'Reset scheduled notifications, badges and timeline.',
+                          icon: Icons.delete_sweep,
+                          color: Colors.redAccent,
+                          onTap: () async {
+                            final messenger = ScaffoldMessenger.of(context);
+                            await _notificationService.clearAllNotifications();
+                            if (!mounted) return;
+                            messenger.showSnackBar(
+                              const SnackBar(
+                                  content: Text('Demo state cleared.')),
+                            );
+                          },
+                          onInfoTap: () => _showFeatureInfo(
+                            context,
+                            title: 'Clear Demo State',
+                            body:
+                                'Cancels scheduled notifications, resets badges, clears local history and activity logs to give '
+                                'you a fresh testing slate.',
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 32),
+                    _buildTemplatePlayground(provider),
+                    const SizedBox(height: 32),
+                    _buildNotificationStream(context, provider),
+                    const SizedBox(height: 28),
+                    _buildActivityTimeline(provider),
                   ],
                 ),
-                const SizedBox(height: 32),
-                _buildTemplatePlayground(provider),
-                const SizedBox(height: 32),
-                _buildNotificationStream(context, provider),
-                const SizedBox(height: 28),
-                _buildActivityTimeline(provider),
-              ],
-            ),
-          ),
-        ],
-      );
+              ),
+            ],
+          );
         },
       ),
     );

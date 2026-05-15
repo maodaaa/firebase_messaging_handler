@@ -62,8 +62,7 @@ class _InboxScreenState extends State<InboxScreen> {
         body: 'Upgrade before midnight to lock in pricing.',
         subtitle: 'Category: promotion',
         timestamp: now.subtract(const Duration(hours: 2)),
-        imageUrl:
-            'https://via.placeholder.com/80x80/111827/FFFFFF?text=SALE',
+        imageUrl: 'https://via.placeholder.com/80x80/111827/FFFFFF?text=SALE',
         actions: const <NotificationAction>[
           NotificationAction(
             id: 'view_offer',
@@ -240,4 +239,3 @@ class _InboxScreenState extends State<InboxScreen> {
     );
   }
 }
-

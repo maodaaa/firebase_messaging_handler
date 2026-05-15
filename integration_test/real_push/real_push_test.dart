@@ -92,8 +92,7 @@ void main() {
     expect(
       result.overallStatus,
       anyOf('granted', 'provisional'),
-      reason:
-          'Expected granted or provisional, got: ${result.overallStatus}. '
+      reason: 'Expected granted or provisional, got: ${result.overallStatus}. '
           'Notes: ${result.notes.join(', ')}',
     );
   }, timeout: const Timeout(Duration(seconds: 15)));
@@ -183,8 +182,7 @@ void main() {
         return;
       }
 
-      final result =
-          await FirebaseMessagingHandler.instance.runDiagnostics();
+      final result = await FirebaseMessagingHandler.instance.runDiagnostics();
 
       expect(
         result.fcmTokenAvailable,
@@ -195,8 +193,7 @@ void main() {
       expect(
         result.permissionsGranted,
         isTrue,
-        reason:
-            'Diagnostics should report permissions granted. '
+        reason: 'Diagnostics should report permissions granted. '
             'Status: ${result.authorizationStatus}',
       );
 

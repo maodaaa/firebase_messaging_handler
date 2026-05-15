@@ -268,4 +268,3 @@ class _NotificationInboxViewState extends State<NotificationInboxView> {
     );
   }
 }
-
