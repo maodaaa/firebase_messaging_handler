@@ -37,8 +37,7 @@ class NotificationManager {
       FirebaseMessagingHandlerNotificationService.instance;
   final FmhAnalyticsService _analyticsService = FmhAnalyticsService.instance;
   final StorageService _storageService = StorageService.instance;
-  final NotificationInboxStorageInterface _inboxStorage =
-      InboxStorageService();
+  final NotificationInboxStorageInterface _inboxStorage = InboxStorageService();
 
   final InAppMessageManager _inAppMessageManager = InAppMessageManager.instance;
   final BadgeManager _badgeManager = BadgeManager.instance;
@@ -120,7 +119,8 @@ class NotificationManager {
       );
 
       // Handle FCM token
-      await _handleFCMToken(senderId, updateTokenCallback, webVapidKey: webVapidKey);
+      await _handleFCMToken(senderId, updateTokenCallback,
+          webVapidKey: webVapidKey);
 
       if (updateTokenCallback != null) {
         _listenForTokenRefresh(updateTokenCallback);
@@ -164,8 +164,8 @@ class NotificationManager {
           if (_pendingClickEvents.isEmpty) {
             return;
           }
-          for (final NotificationData? event in List<NotificationData?>.from(
-              _pendingClickEvents)) {
+          for (final NotificationData? event
+              in List<NotificationData?>.from(_pendingClickEvents)) {
             _clickStreamController?.add(event);
           }
           _pendingClickEvents.clear();
@@ -236,8 +236,7 @@ class NotificationManager {
 
   /// Processes a notification
   Future<void> processNotification(RemoteMessage message,
-      {bool isFromTerminated = false,
-      bool emitToClickStream = true}) async {
+      {bool isFromTerminated = false, bool emitToClickStream = true}) async {
     try {
       if (!_openedNotifications.contains(message.messageId.hashCode)) {
         _openedNotifications.add(message.messageId.hashCode);
@@ -388,6 +387,28 @@ class NotificationManager {
     } catch (error, stack) {
       _logMessage(
           '[NotificationManager] Get pending notifications error: $error');
+      _logMessage('[NotificationManager] Stack trace: $stack');
+      return null;
+    }
+  }
+
+  /// Refreshes the timezone used for local notification scheduling.
+  Future<String?> refreshLocalTimezone() async {
+    try {
+      return await _notificationService.refreshLocalTimezone();
+    } catch (error, stack) {
+      _logMessage('[NotificationManager] Refresh timezone error: $error');
+      _logMessage('[NotificationManager] Stack trace: $stack');
+      return null;
+    }
+  }
+
+  /// Returns the timezone currently configured for local scheduling.
+  Future<String?> getConfiguredLocalTimezone() async {
+    try {
+      return await _notificationService.getConfiguredLocalTimezone();
+    } catch (error, stack) {
+      _logMessage('[NotificationManager] Get timezone error: $error');
       _logMessage('[NotificationManager] Stack trace: $stack');
       return null;
     }
@@ -546,8 +567,7 @@ class NotificationManager {
     _dataOnlyMessageBridge = bridge;
   }
 
-  Future<void> setUnifiedMessageHandler(
-      UnifiedMessageHandler? handler) async {
+  Future<void> setUnifiedMessageHandler(UnifiedMessageHandler? handler) async {
     _unifiedMessageHandler = handler;
     if (handler != null) {
       await _replayQueuedBackgroundMessages();
@@ -607,12 +627,13 @@ class NotificationManager {
       _analyticsService.trackNotificationReceived(message);
       await _maybeBridgeDataOnlyMessage(message);
 
-      bool handled =
-          await _invokeUnifiedHandler(message, NotificationLifecycle.background);
+      bool handled = await _invokeUnifiedHandler(
+          message, NotificationLifecycle.background);
 
       if (_backgroundMessageCallback != null) {
         try {
-          final bool callbackHandled = await _backgroundMessageCallback!(message);
+          final bool callbackHandled =
+              await _backgroundMessageCallback!(message);
           handled = handled && callbackHandled;
         } catch (error, stack) {
           _logMessage(
@@ -650,6 +671,8 @@ class NotificationManager {
       final bool badgeSupported = await _notificationService.isBadgeSupported();
       final List<dynamic> pendingNotifications =
           await _notificationService.getPendingNotifications();
+      final String? configuredTimezone =
+          await _notificationService.getConfiguredLocalTimezone();
 
       final String webPermission =
           await _notificationService.getWebNotificationPermissionStatus();
@@ -671,9 +694,8 @@ class NotificationManager {
       }
 
       if (!fcmSupported) {
-        recommendations.add(
-            _fcmService.unsupportedPlatformReason ??
-                'Firebase Cloud Messaging is unavailable on this platform.');
+        recommendations.add(_fcmService.unsupportedPlatformReason ??
+            'Firebase Cloud Messaging is unavailable on this platform.');
         recommendations.add(
             'Use local notifications, scheduling, inbox, and in-app templates on desktop. For remote delivery, send through your own backend and handle desktop presentation locally.');
       }
@@ -693,8 +715,7 @@ class NotificationManager {
             'Browser notifications are currently "$webPermission". Trigger a permission prompt or guide the user to allow notifications.');
       }
 
-      if (isWeb &&
-          webRuntimeDiagnostics['notificationApiAvailable'] == false) {
+      if (isWeb && webRuntimeDiagnostics['notificationApiAvailable'] == false) {
         recommendations.add(
             'This browser does not expose the Notification API. Use a supported browser such as Chrome, Edge, or Safari with web notifications enabled.');
       }
@@ -744,6 +765,7 @@ class NotificationManager {
           'webPermission': webPermission,
           'webDiagnostics': webRuntimeDiagnostics,
           'storedTokenPresent': tokenAvailable,
+          'configuredTimezone': configuredTimezone,
           'deliveryPolicy': deliveryDiagnostics,
           'queuedBackgroundMessages': queuedBackgroundMessages,
           'dataBridgeEnabled': _dataOnlyMessageBridge != null,
@@ -977,8 +999,7 @@ class NotificationManager {
         await _maybeBridgeDataOnlyMessage(message);
       }
 
-      await _invokeUnifiedHandler(
-          message, NotificationLifecycle.foreground);
+      await _invokeUnifiedHandler(message, NotificationLifecycle.foreground);
 
       if (!_foregroundOptions.enabled) {
         return;
@@ -1224,8 +1245,7 @@ class NotificationManager {
     if (event == null) {
       return;
     }
-    if (_clickStreamController != null &&
-        _clickStreamController!.hasListener) {
+    if (_clickStreamController != null && _clickStreamController!.hasListener) {
       _clickStreamController!.add(event);
     } else {
       _pendingClickEvents.add(event);
@@ -1351,7 +1371,7 @@ class NotificationManager {
   }
 
   /// Schedules a recurring notification
-  Future<void> scheduleRecurringNotification({
+  Future<bool> scheduleRecurringNotification({
     required int id,
     required String title,
     required String body,
@@ -1392,10 +1412,61 @@ class NotificationManager {
         _logMessage(
             '[NotificationManager] Recurring notification scheduled: $id (${repeatInterval.name})');
       }
+      return scheduled;
     } catch (error, stack) {
       _logMessage(
           '[NotificationManager] Schedule recurring notification error: $error');
       _logMessage('[NotificationManager] Stack trace: $stack');
+      return false;
+    }
+  }
+
+  /// Schedules a weekly notification on a specific weekday.
+  Future<bool> scheduleWeeklyNotification({
+    required int id,
+    required String title,
+    required String body,
+    required int weekday,
+    required int hour,
+    required int minute,
+    String? channelId,
+    Map<String, dynamic>? payload,
+    List<NotificationAction>? actions,
+  }) async {
+    try {
+      final DateTime initial = _nextWeeklyDate(
+        weekday: weekday,
+        hour: hour,
+        minute: minute,
+      );
+
+      final bool scheduled =
+          await _notificationService.scheduleRecurringNotification(
+        id: id,
+        title: title,
+        body: body,
+        repeatInterval: RepeatIntervalEnum.weekly,
+        initialScheduleDate: initial,
+        channelId: channelId,
+        payload: payload,
+        actions: actions,
+      );
+
+      if (scheduled) {
+        _analyticsService.trackEvent('notification_scheduled_weekly', {
+          'notification_id': id,
+          'title': title,
+          'weekday': weekday,
+          'scheduled_start': initial.toIso8601String(),
+        });
+        _logMessage(
+            '[NotificationManager] Weekly notification scheduled: $id (weekday: $weekday)');
+      }
+      return scheduled;
+    } catch (error, stack) {
+      _logMessage('[NotificationManager] Schedule weekly error: $error');
+      _logMessage('[NotificationManager] Stack trace: $stack');
+      return false;
     }
   }
 
@@ -1530,10 +1601,10 @@ class NotificationManager {
 
       final String? title =
           message.notification?.title ?? data['title'] as String?;
-      final String? body = message.notification?.body ?? data['body'] as String?;
+      final String? body =
+          message.notification?.body ?? data['body'] as String?;
 
-      if ((title == null || title.isEmpty) &&
-          (body == null || body.isEmpty)) {
+      if ((title == null || title.isEmpty) && (body == null || body.isEmpty)) {
         return;
       }
 
@@ -1576,8 +1647,7 @@ class NotificationManager {
           if (action is! Map) {
             return null;
           }
-          final Map<String, dynamic> parsed =
-              Map<String, dynamic>.from(action);
+          final Map<String, dynamic> parsed = Map<String, dynamic>.from(action);
           final String? id = parsed['id']?.toString();
           final String? title = parsed['title']?.toString();
           if (id == null || title == null) {
@@ -1594,5 +1664,26 @@ class NotificationManager {
         })
         .whereType<NotificationAction>()
         .toList();
+  }
+
+  DateTime _nextWeeklyDate({
+    required int weekday,
+    required int hour,
+    required int minute,
+  }) {
+    final int normalizedWeekday = weekday.clamp(
+      DateTime.monday,
+      DateTime.sunday,
+    );
+    final DateTime now = DateTime.now();
+    var initial = DateTime(now.year, now.month, now.day, hour, minute);
+    final int daysUntilTarget =
+        (normalizedWeekday - initial.weekday + DateTime.daysPerWeek) %
+            DateTime.daysPerWeek;
+    initial = initial.add(Duration(days: daysUntilTarget));
+    if (initial.isBefore(now) || initial.isAtSameMomentAs(now)) {
+      initial = initial.add(const Duration(days: DateTime.daysPerWeek));
+    }
+    return initial;
   }
 }

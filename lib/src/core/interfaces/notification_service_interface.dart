@@ -67,6 +67,12 @@ abstract class NotificationServiceInterface {
   /// Gets pending notifications
   Future<List<dynamic>> getPendingNotifications();
 
+  /// Refreshes the timezone used by scheduled notifications.
+  Future<String?> refreshLocalTimezone();
+
+  /// Returns the timezone currently configured for scheduling.
+  Future<String?> getConfiguredLocalTimezone();
+
   /// Creates a notification channel
   Future<void> createNotificationChannel(NotificationChannelData channel);
 

@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Added
+- `refreshLocalTimezone()` and `getConfiguredLocalTimezone()` on `FirebaseMessagingHandler.instance` for apps that reschedule reminders after app resume or timezone changes.
+- `configuredTimezone` metadata in `runDiagnostics()`.
+- `scheduleWeeklyNotification()` for recurring notifications on a specific weekday.
+
+### Fixed
+- Scheduled notifications now configure `tz.local` from the device timezone via `flutter_timezone` before calling `zonedSchedule`.
+
+---
+
 ## [1.0.4] - 2026-04-23
 
 ### Fixed

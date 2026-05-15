@@ -2,7 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/data/latest.dart' as tz;
+import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import '../utils/web_interop.dart' as web_interop;
 import '../interfaces/notification_service_interface.dart';
@@ -21,6 +22,7 @@ class FirebaseMessagingHandlerNotificationService
   bool _isInitialized = false;
   final StorageService _storageService = StorageService.instance;
   int? _cachedBadgeCount;
+  String? _configuredTimezoneIdentifier;
 
   /// Singleton instance
   static FirebaseMessagingHandlerNotificationService get instance {
@@ -56,8 +58,7 @@ class FirebaseMessagingHandlerNotificationService
 
       _localNotifications = FlutterLocalNotificationsPlugin();
 
-      // Initialize timezone data for scheduled notifications
-      tz.initializeTimeZones();
+      await refreshLocalTimezone();
 
       final InitializationSettings initializationSettings =
           InitializationSettings(
@@ -454,6 +455,16 @@ class FirebaseMessagingHandlerNotificationService
   }
 
   @override
+  Future<String?> refreshLocalTimezone() async {
+    return await _configureLocalTimeZone();
+  }
+
+  @override
+  Future<String?> getConfiguredLocalTimezone() async {
+    return _configuredTimezoneIdentifier;
+  }
+
+  @override
   Future<void> createNotificationChannel(
       NotificationChannelData channel) async {
     try {
@@ -550,7 +561,8 @@ class FirebaseMessagingHandlerNotificationService
     try {
       return web_interop.getWebRuntimeDiagnostics();
     } catch (error, stack) {
-      _logMessage('[NotificationService] Web runtime diagnostics error: $error');
+      _logMessage(
+          '[NotificationService] Web runtime diagnostics error: $error');
       _logMessage('[NotificationService] Stack trace: $stack');
       return <String, dynamic>{
         'supported': false,
@@ -819,6 +831,37 @@ class FirebaseMessagingHandlerNotificationService
           '[NotificationService] Configure iOS categories error: $error');
       _logMessage('[NotificationService] Stack trace: $stack');
     }
+  }
+
+  Future<String?> _configureLocalTimeZone() async {
+    if (isWeb) {
+      _configuredTimezoneIdentifier = null;
+      return null;
+    }
+
+    tz.initializeTimeZones();
+
+    if (isLinux || isWindows) {
+      _configuredTimezoneIdentifier = null;
+      return null;
+    }
+
+    try {
+      final TimezoneInfo timeZoneInfo =
+          await FlutterTimezone.getLocalTimezone();
+      final String identifier = timeZoneInfo.identifier.trim();
+      if (identifier.isNotEmpty) {
+        tz.setLocalLocation(tz.getLocation(identifier));
+        _configuredTimezoneIdentifier = identifier;
+        return identifier;
+      }
+    } catch (error, stack) {
+      _logMessage('[NotificationService] Configure timezone error: $error');
+      _logMessage('[NotificationService] Stack trace: $stack');
+    }
+
+    _configuredTimezoneIdentifier = null;
+    return null;
   }
 
   Future<void> _onNotificationResponse(NotificationResponse response) async {

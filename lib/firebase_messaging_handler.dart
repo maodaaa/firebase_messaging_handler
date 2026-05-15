@@ -17,6 +17,7 @@ export 'firebase_messaging_handler_linux.dart';
 export 'firebase_messaging_handler_windows.dart';
 
 @pragma('vm:entry-point')
+
 /// Default background dispatcher entry point that forwards work into the
 /// package-managed background handler pipeline.
 Future<void> firebaseMessagingHandlerBackgroundDispatcher(
@@ -448,7 +449,7 @@ class FirebaseMessagingHandler {
           interval = RepeatIntervalEnum.daily;
       }
 
-      await _notificationManager.scheduleRecurringNotification(
+      return await _notificationManager.scheduleRecurringNotification(
         id: id,
         title: title,
         body: body,
@@ -459,7 +460,38 @@ class FirebaseMessagingHandler {
         payload: payload,
         actions: actions,
       );
-      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Schedules a weekly notification on a specific weekday.
+  ///
+  /// [weekday] uses Dart's [DateTime] weekday constants:
+  /// `DateTime.monday` through `DateTime.sunday`.
+  Future<bool> scheduleWeeklyNotification({
+    required int id,
+    required String title,
+    required String body,
+    required int weekday,
+    required int hour,
+    required int minute,
+    String? channelId,
+    Map<String, dynamic>? payload,
+    List<NotificationAction>? actions,
+  }) async {
+    try {
+      return await _notificationManager.scheduleWeeklyNotification(
+        id: id,
+        title: title,
+        body: body,
+        weekday: weekday,
+        hour: hour,
+        minute: minute,
+        channelId: channelId,
+        payload: payload,
+        actions: actions,
+      );
     } catch (e) {
       return false;
     }
@@ -487,6 +519,19 @@ class FirebaseMessagingHandler {
   /// in the future. This is primarily supported on Android.
   Future<List<dynamic>?> getPendingNotifications() async {
     return await _notificationManager.getPendingNotifications();
+  }
+
+  /// Refreshes the device timezone used by scheduled local notifications.
+  ///
+  /// Call this on app resume before rescheduling reminders if users may travel
+  /// or change their system timezone while the app is backgrounded.
+  Future<String?> refreshLocalTimezone() async {
+    return await _notificationManager.refreshLocalTimezone();
+  }
+
+  /// Returns the timezone currently configured for scheduled notifications.
+  Future<String?> getConfiguredLocalTimezone() async {
+    return await _notificationManager.getConfiguredLocalTimezone();
   }
 
   /// Shows a grouped notification (Android notification groups)
