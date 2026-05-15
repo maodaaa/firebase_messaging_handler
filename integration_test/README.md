@@ -1,85 +1,85 @@
 # Integration Tests
 
-This directory contains two categories of integration tests:
+This repository has two integration-test surfaces:
 
-| File | Type | Firebase required? |
-|------|------|--------------------|
-| `handlers_integration_test.dart` | Synthetic (no real FCM) | No |
-| `real_push/real_push_test.dart` | Real FCM end-to-end | Yes |
+| Location | Type | Device app available? | Firebase required? |
+| --- | --- | --- | --- |
+| `integration_test/handlers_integration_test.dart` | Synthetic package-root handler tests | No | No |
+| `example/integration_test/comprehensive_test.dart` | Example-app feature checklist | Yes | Optional for send-dependent cases |
+| `example/integration_test/real_push_test.dart` | Real FCM end-to-end tests | Yes | Yes |
+
+The package root is a Flutter plugin, not an app. Device-deployable Android and iOS integration tests must run from `example/`, because that directory contains the app runners and platform manifests.
 
 ---
 
-## Synthetic tests (`handlers_integration_test.dart`)
+## Synthetic Package-Root Tests
 
-No credentials or physical device required. Uses `RemoteMessage` objects to
-exercise the handler pipeline without touching Firebase infrastructure.
+`integration_test/handlers_integration_test.dart` exercises the handler pipeline with synthetic `RemoteMessage` objects. It does not deploy to Android or iOS.
 
 ```bash
 flutter test integration_test/handlers_integration_test.dart
 ```
 
+Use this for fast local checks that do not require Firebase credentials, a physical device, or platform notification permissions.
+
 ---
 
-## Real-FCM tests (`real_push/real_push_test.dart`)
+## Android Example-App Tests
 
-Sends actual FCM payloads to a connected device and asserts receipt in-process.
-All five tests **self-skip** when the service account file is absent (CI-safe).
+Run device tests from the `example/` directory.
 
 ### Prerequisites
 
-1. **Service account key** — place at `test/firebase_config/service_account.json`
-   Generate: Firebase Console → Project Settings → Service Accounts → Generate new private key
+1. A connected, unlocked Android device.
+2. Firebase config in `example/lib/firebase_options.dart` and `example/android/app/google-services.json`.
+3. For real FCM sends, a service account key at `test/firebase_config/service_account.json`.
+4. The Firebase project number, also called the sender ID.
 
-2. **Sender ID** — your Firebase project number (not project name)
-   Find: Firebase Console → Project Settings → General → "Project number"
+### Comprehensive Feature Checklist
 
-3. **Physical device** — plugged in and unlocked
-
-4. **App in foreground** during test 3 (foreground notification receipt)
-
-### Run (from `example/` directory)
+This test covers initialization, token handling, permissions, diagnostics, analytics, unified handlers, data-only bridging, scheduling, badges, notification display, custom channels, in-app messaging, and inbox behavior.
 
 ```bash
-# 1. Base64-encode the service account (from package root)
-BASE64=$(base64 -i test/firebase_config/service_account.json | tr -d '\n')
+BASE64=$(base64 -i ../test/firebase_config/service_account.json | tr -d '\n')
 
-# 2. Run from example/
-cd example
+flutter test integration_test/comprehensive_test.dart \
+  --dart-define=FCM_TEST_SENDER_ID=<your-project-number> \
+  --dart-define=FCM_SERVICE_ACCOUNT_B64=$BASE64 \
+  --device-id <device-id>
+```
+
+If `FCM_SERVICE_ACCOUNT_B64` is omitted, send-dependent cases are skipped instead of failing.
+
+### Real FCM End-to-End Test
+
+This test retrieves a real device token, sends FCM HTTP v1 messages to that token, verifies diagnostics, and verifies data-only processing.
+
+```bash
+BASE64=$(base64 -i ../test/firebase_config/service_account.json | tr -d '\n')
+
 flutter test integration_test/real_push_test.dart \
   --dart-define=FCM_TEST_SENDER_ID=<your-project-number> \
   --dart-define=FCM_SERVICE_ACCOUNT_B64=$BASE64 \
   --device-id <device-id>
 ```
 
-> **Note:** Tests must run from the `example/` directory — the package root has
-> no Android/iOS app to deploy to device. The test APK authenticates with Google
-> OAuth2 and POSTs FCM messages to itself via `fcm.googleapis.com`.
+The foreground notification send is automated up to delivery. The final notification tap still requires user interaction unless a native UI automation layer is added later.
 
-### Test scenarios
+### Notification Permission
 
-| # | Test | What it verifies |
-|---|------|------------------|
-| 1 | Token retrieval | `getFcmToken()` returns a non-null, non-empty string |
-| 2 | Permissions | `requestPermissionsWizard()` returns `granted` or `provisional` |
-| 3 | Foreground notification | Message sent → click emitted on the stream returned by `init()` |
-| 4 | Data-only payload | Silent push with `fcmh_inapp` key processes without crashing |
-| 5 | Diagnostics | `runDiagnostics()` reports `fcmTokenAvailable` and `permissionsGranted` |
+On Android 13+, pre-grant notification permission when you want deterministic permission assertions:
 
-### Limitations
+```bash
+adb shell pm grant qoder.flutter.fmhexample android.permission.POST_NOTIFICATIONS || true
+```
 
-| Scenario | Status | Notes |
-|----------|--------|-------|
-| Foreground receipt | ✅ Tested | App must be in foreground; user taps notification |
-| Data-only (silent push) | ✅ Tested | In-process handler; no UI interaction needed |
-| Token retrieval | ✅ Tested | Direct SDK call |
-| Permissions | ✅ Tested | Direct SDK call |
-| Background handler (app backgrounded) | ⚠️ Partial | Handler registration is tested; app cannot be backgrounded from inside the test runner |
-| Terminated state (cold start) | ❌ Manual only | See `test/firebase_config/terminated_state_manual.sh` |
-| Windows/Linux desktop local mode | ❌ Manual only | Validate with the example app and Notification Doctor on actual desktop runners |
+If the package is not installed yet, Android may print `package not found`; the test can still install and request permission during setup.
 
-### Terminated-state manual test
+---
 
-For cold-start scenarios, use the manual shell helper:
+## Manual Cold-Start Test
+
+Terminated-state cold-start behavior still requires manual verification because the app must be killed and relaunched by tapping a notification.
 
 ```bash
 bash test/firebase_config/terminated_state_manual.sh \
@@ -90,10 +90,6 @@ bash test/firebase_config/terminated_state_manual.sh \
 
 ---
 
-## CI integration
+## CI Notes
 
-There is no automated CI pipeline. All tests are run manually.
-
-When `test/firebase_config/service_account.json` is absent, all real-FCM
-tests emit `SKIP` rather than `FAIL` — so running the full test suite locally
-without credentials is always safe.
+The real-FCM tests are safe to run without credentials because send-dependent cases skip when credentials are absent. For full end-to-end CI, use a physical-device runner or device farm with Firebase config, service account injection, and notification permission handling.

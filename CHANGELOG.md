@@ -7,37 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
-
----
-
-## [1.0.5] - 2026-05-16
+## [1.0.6]
 
 ### Added
-- `refreshLocalTimezone()` and `getConfiguredLocalTimezone()` on `FirebaseMessagingHandler.instance` for apps that reschedule reminders after app resume or timezone changes.
-- `configuredTimezone` metadata in `runDiagnostics()`.
-- `scheduleWeeklyNotification()` for recurring notifications on a specific weekday.
-- Swift Package Manager manifest at `ios/firebase_messaging_handler/Package.swift`, matching Flutter's current SPM package layout expectation.
+- **Release checklist documentation** — added a package release checklist covering formatting, analysis, tests, dry-run publishing, `pana` scoring, and Android integration tests
+- **Platform capability guide** — expanded the docs landing page with platform support, setup paths, and capability expectations across Android, iOS, Web, desktop, and macOS
 
 ### Changed
-- Web/WASM analysis now uses a web-safe notification manager and foreground-options import path so the public web import graph no longer pulls in native local-notification implementations.
-- `NotificationChannelData` remains platform-neutral; Android conversion to `AndroidNotificationChannel` now lives in the Flutter local notifications extension layer.
-- iOS podspec version now matches the package release version.
+- **Integration test guide** — refreshed Android integration-test instructions to clarify that runnable device tests live under the example app, while package-root integration tests are synthetic only
+- **README documentation index** — updated documentation links from the stale `docs/` path to the actual `doc/` directory
 
 ### Fixed
-- Scheduled notifications now configure `tz.local` from the device timezone via `flutter_timezone` before calling `zonedSchedule`.
-- Pub platform scoring now reaches 160/160 locally: full platform support, WASM-ready status, Swift PM-ready status, clean static analysis, and current dependency support.
-
-### Verified
-- `flutter analyze`
-- `flutter test`
-- `flutter pub publish --dry-run`
-- `pana` package scoring with Flutter SDK: 160/160
-- Android device integration tests on `A015` / Android 16: `example/integration_test/comprehensive_test.dart` and `example/integration_test/real_push_test.dart`
+- **Stale README roadmap** — removed the outdated note that listed already-shipped capabilities as “coming up”
+- **Release documentation drift** — moved verification details out of release notes and into the dedicated release checklist
 
 ---
 
-## [1.0.4] - 2026-04-23
+## [1.0.5]
+
+### Added
+- **Timezone refresh APIs** — `refreshLocalTimezone()` and `getConfiguredLocalTimezone()` added to `FirebaseMessagingHandler.instance` for apps that reschedule reminders after app resume or timezone changes
+- **Diagnostics timezone metadata** — `runDiagnostics()` now includes the currently configured timezone in `configuredTimezone`
+- **Weekly scheduling helper** — `scheduleWeeklyNotification()` added for recurring notifications on a specific weekday
+- **Swift Package Manager manifest path** — added `ios/firebase_messaging_handler/Package.swift`, matching Flutter's current SPM package layout expectation
+
+### Changed
+- **Web/WASM public import graph** — web analysis now uses a web-safe notification manager and foreground-options path so native local-notification implementations are not pulled into WASM analysis
+- **Platform-neutral channel model** — `NotificationChannelData` no longer directly depends on `flutter_local_notifications`; Android conversion to `AndroidNotificationChannel` now lives in the Flutter local notifications extension layer
+- **iOS podspec version sync** — podspec version now matches the package release version
+
+### Fixed
+- **Timezone-safe scheduled notifications** — scheduled notifications now configure `tz.local` from the device timezone via `flutter_timezone` before calling `zonedSchedule`
+- **Pub platform scoring** — package now reports full platform support with WASM-ready and Swift PM-ready status
+
+---
+
+## [1.0.4]
 
 ### Fixed
 - **Web: `webVapidKey` parameter added to `init()`** — FCM token retrieval on web now works correctly. Pass your Firebase Web Push certificate key via `webVapidKey`; previously `senderId` was incorrectly forwarded as the VAPID key, causing token fetch to fail silently
@@ -49,7 +54,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.0.3] - 2026-03-08
+## [1.0.3]
 
 ### Added
 - **Swift Package Manager (SPM) support** — `ios/Package.swift` added; iOS plugin now resolves via SPM in addition to CocoaPods
@@ -60,14 +65,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.0.2] - 2026-03-08
+## [1.0.2]
 
 ### Changed
 - `flutter_local_notifications` lower bound tightened to `^21.0.0` — aligns constraint with the v21 named parameter API the package actually requires
 
 ---
 
-## [1.0.1] - 2026-03-08
+## [1.0.1]
 
 ### Changed
 - `flutter_local_notifications` constraint widened to `>=18.0.1 <22.0.0` — now fully compatible with v21 (named parameter API)
@@ -79,7 +84,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.0.0] - 2026-03-08
+## [1.0.0]
 
 ### Added
 - **Android & macOS platform support** — both platforms now fully declared
@@ -206,7 +211,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.2]
 
 ### Added
-- MIT license file
+- BSD 3-Clause license file
 - Flutter SDK constraint added (`>=2.12.0`)
 - Broader dependency compatibility — lowered minimum SDK requirements
 

@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'firebase_messaging_handler'
-  s.version          = '1.0.5'
+  s.version          = '1.0.6'
   s.summary          = 'Production-ready Flutter plugin for Firebase Cloud Messaging with inbox, in-app UX, badges, diagnostics, and scheduling.'
   s.description      = <<-DESC
 Production-ready Flutter plugin for Firebase Cloud Messaging with a unified click stream, notification inbox, in-app messaging, diagnostics, badges, and scheduling.
