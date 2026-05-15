@@ -79,7 +79,7 @@ clickStream?.listen((NotificationData? data) {
 
 ### **🎨 Advanced Features**
 - **⚡ Interactive Notification Actions** - Custom buttons with payload handling
-- **⏰ Notification Scheduling** - One-time and recurring notifications
+- **⏰ Notification Scheduling** - One-time and recurring notifications with device-timezone-aware scheduling
 - **🔢 Badge Management** - Cross-platform badge count management
 - **📦 Notification Grouping** - Android groups and iOS conversation threads
 - **🔊 Custom Sound Support** - Platform-specific sound customization
@@ -587,6 +587,12 @@ NotificationInboxView(
 ```
 
 ### **Notification Scheduling**
+
+Scheduled notifications use the device timezone. If your app reschedules reminders on resume, refresh the timezone first:
+
+```dart
+await FirebaseMessagingHandler.instance.refreshLocalTimezone();
+```
 
 ```dart
 // Schedule a one-time notification
