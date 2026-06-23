@@ -6,16 +6,21 @@ import PackageDescription
 let package = Package(
     name: "firebase_messaging_handler",
     platforms: [
-        .iOS("13.0"),
+        .iOS("15.0"),
     ],
     products: [
         .library(name: "firebase-messaging-handler", targets: ["firebase_messaging_handler"]),
     ],
+    dependencies: [
+        .package(name: "FlutterFramework", path: "../FlutterFramework")
+    ],
     targets: [
         .target(
             name: "firebase_messaging_handler",
-            dependencies: [],
-            path: "Classes"
+            dependencies: [
+                .product(name: "FlutterFramework", package: "FlutterFramework")
+            ],
+            path: "Sources/firebase_messaging_handler"
         ),
     ]
 )
