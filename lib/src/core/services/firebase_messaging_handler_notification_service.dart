@@ -20,30 +20,24 @@ import '../interfaces/notification_state_store.dart';
 
 /// Background action entry point used by `flutter_local_notifications`.
 @pragma('vm:entry-point')
-void firebaseMessagingHandlerNotificationTapBackground(
-  NotificationResponse response,
-) {
+void firebaseMessagingHandlerNotificationTapBackground(NotificationResponse response) {
   WidgetsFlutterBinding.ensureInitialized();
   unawaited(
-    FirebaseMessagingHandlerNotificationService.instance
-        .handleNotificationResponse(
-          response,
-          lifecycle: NotificationLifecycle.background,
-        ),
+    FirebaseMessagingHandlerNotificationService.instance.handleNotificationResponse(
+      response,
+      lifecycle: NotificationLifecycle.background,
+    ),
   );
 }
 
 /// Local notification service implementation for Firebase Messaging Handler
-class FirebaseMessagingHandlerNotificationService
-    implements NotificationServiceInterface {
+class FirebaseMessagingHandlerNotificationService implements NotificationServiceInterface {
   static FirebaseMessagingHandlerNotificationService? _instance;
   FlutterLocalNotificationsPlugin? _localNotifications;
   bool _isInitialized = false;
   final StorageService _storageService = StorageService.instance;
-  final NotificationPlatformBridge _platformBridge =
-      NotificationPlatformBridge.instance;
-  final NotificationStateStore _backgroundStateStore =
-      SharedPreferencesNotificationStateStore();
+  final NotificationPlatformBridge _platformBridge = NotificationPlatformBridge.instance;
+  final NotificationStateStore _backgroundStateStore = SharedPreferencesNotificationStateStore();
   int? _cachedBadgeCount;
   String? _configuredTimezoneIdentifier;
   bool _debugLoggingEnabled = false;
@@ -62,9 +56,7 @@ class FirebaseMessagingHandlerNotificationService
       return;
     }
     if (!_isInitialized || _localNotifications == null) {
-      throw Exception(
-        'NotificationService not initialized. Call initialize() first.',
-      );
+      throw Exception('NotificationService not initialized. Call initialize() first.');
     }
   }
 
@@ -72,8 +64,7 @@ class FirebaseMessagingHandlerNotificationService
   Future<bool> initialize({
     required List<NotificationChannelData> androidChannels,
     required String androidIconPath,
-    List<NotificationActionCategory> actionCategories =
-        const <NotificationActionCategory>[],
+    List<NotificationActionCategory> actionCategories = const <NotificationActionCategory>[],
     WindowsNotificationOptions? windows,
     bool enableDebugLogging = false,
   }) async {
@@ -94,32 +85,28 @@ class FirebaseMessagingHandlerNotificationService
       final List<DarwinNotificationCategory> darwinCategories = actionCategories
           .map(_toDarwinCategory)
           .toList();
-      final DarwinInitializationSettings darwinSettings =
-          DarwinInitializationSettings(
-            requestAlertPermission: false,
-            requestSoundPermission: false,
-            requestBadgePermission: false,
-            requestProvisionalPermission: false,
-            requestCriticalPermission: false,
-            notificationCategories: darwinCategories,
-          );
-      final InitializationSettings initializationSettings =
-          InitializationSettings(
-            android: AndroidInitializationSettings(androidIconPath),
-            iOS: darwinSettings,
-            macOS: darwinSettings,
-            linux: const LinuxInitializationSettings(
-              defaultActionName: 'Open notification',
-            ),
-            windows: windows == null
-                ? null
-                : WindowsInitializationSettings(
-                    appName: windows.appName,
-                    appUserModelId: windows.appUserModelId,
-                    guid: windows.guid,
-                    iconPath: windows.iconPath,
-                  ),
-          );
+      final DarwinInitializationSettings darwinSettings = DarwinInitializationSettings(
+        requestAlertPermission: false,
+        requestSoundPermission: false,
+        requestBadgePermission: false,
+        requestProvisionalPermission: false,
+        requestCriticalPermission: false,
+        notificationCategories: darwinCategories,
+      );
+      final InitializationSettings initializationSettings = InitializationSettings(
+        android: AndroidInitializationSettings(androidIconPath),
+        iOS: darwinSettings,
+        macOS: darwinSettings,
+        linux: const LinuxInitializationSettings(defaultActionName: 'Open notification'),
+        windows: windows == null
+            ? null
+            : WindowsInitializationSettings(
+                appName: windows.appName,
+                appUserModelId: windows.appUserModelId,
+                guid: windows.guid,
+                iconPath: windows.iconPath,
+              ),
+      );
 
       final bool? isInitialized = await _localNotifications!.initialize(
         settings: initializationSettings,
@@ -128,7 +115,7 @@ class FirebaseMessagingHandlerNotificationService
             firebaseMessagingHandlerNotificationTapBackground,
       );
 
-      if (isInitialized == true) {
+      if (isInitialized == true || isIOS || isMacOS) {
         // Create Android notification channels
         for (final NotificationChannelData channel in androidChannels) {
           await _createAndroidChannel(channel);
@@ -235,9 +222,7 @@ class FirebaseMessagingHandlerNotificationService
   }) async {
     try {
       if (isWeb) {
-        _logMessage(
-          '[NotificationService] Notification actions are not supported on web',
-        );
+        _logMessage('[NotificationService] Notification actions are not supported on web');
         return await showWebNotification(
           title: title,
           body: body,
@@ -269,21 +254,15 @@ class FirebaseMessagingHandlerNotificationService
         payload: jsonEncode({
           'title': title,
           'body': body,
-          'actions': actions
-              .map((NotificationAction action) => action.toMap())
-              .toList(),
+          'actions': actions.map((NotificationAction action) => action.toMap()).toList(),
           ...payload ?? {},
         }),
       );
 
-      _logMessage(
-        '[NotificationService] Notification with actions shown: $title',
-      );
+      _logMessage('[NotificationService] Notification with actions shown: $title');
       return true;
     } catch (error, stack) {
-      _logMessage(
-        '[NotificationService] Show notification with actions error: $error',
-      );
+      _logMessage('[NotificationService] Show notification with actions error: $error');
       _logMessage('[NotificationService] Stack trace: $stack');
       return false;
     }
@@ -303,16 +282,12 @@ class FirebaseMessagingHandlerNotificationService
   }) async {
     try {
       if (isWeb) {
-        _logMessage(
-          '[NotificationService] Scheduling is not supported on web - ignoring request',
-        );
+        _logMessage('[NotificationService] Scheduling is not supported on web - ignoring request');
         return false;
       }
 
       if (scheduledDate.isBefore(DateTime.now())) {
-        _logMessage(
-          '[NotificationService] Cannot schedule notification in the past',
-        );
+        _logMessage('[NotificationService] Cannot schedule notification in the past');
         return false;
       }
 
@@ -343,9 +318,7 @@ class FirebaseMessagingHandlerNotificationService
         payload: jsonEncode(payload ?? {}),
       );
 
-      _logMessage(
-        '[NotificationService] Notification scheduled for: ${scheduledDate.toString()}',
-      );
+      _logMessage('[NotificationService] Notification scheduled for: ${scheduledDate.toString()}');
       return true;
     } catch (error, stack) {
       _logMessage('[NotificationService] Schedule notification error: $error');
@@ -367,9 +340,7 @@ class FirebaseMessagingHandlerNotificationService
   }) async {
     try {
       if (isWeb) {
-        _logMessage(
-          '[NotificationService] Recurring scheduling is not supported on web',
-        );
+        _logMessage('[NotificationService] Recurring scheduling is not supported on web');
         return false;
       }
 
@@ -390,8 +361,7 @@ class FirebaseMessagingHandlerNotificationService
         ),
       );
 
-      final Map<String, dynamic> encodedPayload =
-          payload ?? <String, dynamic>{};
+      final Map<String, dynamic> encodedPayload = payload ?? <String, dynamic>{};
 
       if (repeatInterval == RepeatIntervalEnum.hourly ||
           repeatInterval == RepeatIntervalEnum.minutely) {
@@ -400,8 +370,7 @@ class FirebaseMessagingHandlerNotificationService
             '[NotificationService] Actions are not supported for periodic notifications; ignoring provided actions',
           );
         }
-        final RepeatInterval periodicInterval =
-            repeatInterval == RepeatIntervalEnum.hourly
+        final RepeatInterval periodicInterval = repeatInterval == RepeatIntervalEnum.hourly
             ? RepeatInterval.hourly
             : RepeatInterval.everyMinute;
 
@@ -425,13 +394,12 @@ class FirebaseMessagingHandlerNotificationService
         initialScheduleDate,
         repeatInterval,
       );
-      final DateTimeComponents? matchComponents =
-          _mapRepeatIntervalToDateTimeComponents(repeatInterval);
+      final DateTimeComponents? matchComponents = _mapRepeatIntervalToDateTimeComponents(
+        repeatInterval,
+      );
 
       if (matchComponents == null) {
-        _logMessage(
-          '[NotificationService] Unsupported repeat interval: ${repeatInterval.name}',
-        );
+        _logMessage('[NotificationService] Unsupported repeat interval: ${repeatInterval.name}');
         return false;
       }
 
@@ -451,9 +419,7 @@ class FirebaseMessagingHandlerNotificationService
       );
       return true;
     } catch (error, stack) {
-      _logMessage(
-        '[NotificationService] Schedule recurring notification error: $error',
-      );
+      _logMessage('[NotificationService] Schedule recurring notification error: $error');
       _logMessage('[NotificationService] Stack trace: $stack');
       return false;
     }
@@ -463,9 +429,7 @@ class FirebaseMessagingHandlerNotificationService
   Future<bool> cancelNotification(int id) async {
     try {
       if (isWeb) {
-        _logMessage(
-          '[NotificationService] Cancel notification ignored on web (no local schedule)',
-        );
+        _logMessage('[NotificationService] Cancel notification ignored on web (no local schedule)');
         return false;
       }
 
@@ -484,9 +448,7 @@ class FirebaseMessagingHandlerNotificationService
   Future<bool> cancelAllNotifications() async {
     try {
       if (isWeb) {
-        _logMessage(
-          '[NotificationService] Cancel all notifications ignored on web',
-        );
+        _logMessage('[NotificationService] Cancel all notifications ignored on web');
         return false;
       }
 
@@ -495,9 +457,7 @@ class FirebaseMessagingHandlerNotificationService
       _logMessage('[NotificationService] All notifications cancelled');
       return true;
     } catch (error, stack) {
-      _logMessage(
-        '[NotificationService] Cancel all notifications error: $error',
-      );
+      _logMessage('[NotificationService] Cancel all notifications error: $error');
       _logMessage('[NotificationService] Stack trace: $stack');
       return false;
     }
@@ -508,8 +468,8 @@ class FirebaseMessagingHandlerNotificationService
     try {
       if (isAndroid) {
         _ensureInitialized();
-        final List<PendingNotificationRequest> pending =
-            await _localNotifications!.pendingNotificationRequests();
+        final List<PendingNotificationRequest> pending = await _localNotifications!
+            .pendingNotificationRequests();
         return pending
             .map(
               (PendingNotificationRequest item) => PendingNotificationSnapshot(
@@ -523,9 +483,7 @@ class FirebaseMessagingHandlerNotificationService
       }
       return <PendingNotificationSnapshot>[];
     } catch (error, stack) {
-      _logMessage(
-        '[NotificationService] Get pending notifications error: $error',
-      );
+      _logMessage('[NotificationService] Get pending notifications error: $error');
       _logMessage('[NotificationService] Stack trace: $stack');
       return <PendingNotificationSnapshot>[];
     }
@@ -536,8 +494,7 @@ class FirebaseMessagingHandlerNotificationService
     if (isWeb) return <ActiveNotificationSnapshot>[];
     try {
       _ensureInitialized();
-      final List<ActiveNotification> active = await _localNotifications!
-          .getActiveNotifications();
+      final List<ActiveNotification> active = await _localNotifications!.getActiveNotifications();
       return active
           .map(
             (ActiveNotification item) => ActiveNotificationSnapshot(
@@ -553,9 +510,7 @@ class FirebaseMessagingHandlerNotificationService
           )
           .toList(growable: false);
     } catch (error, stack) {
-      _logMessage(
-        '[NotificationService] Get active notifications error: $error',
-      );
+      _logMessage('[NotificationService] Get active notifications error: $error');
       _logMessage('[NotificationService] Stack trace: $stack');
       return <ActiveNotificationSnapshot>[];
     }
@@ -568,9 +523,7 @@ class FirebaseMessagingHandlerNotificationService
       final FlutterLocalNotificationsPlugin plugin =
           _localNotifications ?? FlutterLocalNotificationsPlugin();
       return await plugin
-          .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin
-          >()
+          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
           ?.areNotificationsEnabled();
     } catch (error, stack) {
       _logMessage('[NotificationService] Notification status error: $error');
@@ -586,9 +539,7 @@ class FirebaseMessagingHandlerNotificationService
       final FlutterLocalNotificationsPlugin plugin =
           _localNotifications ?? FlutterLocalNotificationsPlugin();
       final AndroidFlutterLocalNotificationsPlugin? android = plugin
-          .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin
-          >();
+          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
       if (android == null) return false;
       await android.deleteNotificationChannel(channelId: channelId);
       return true;
@@ -610,15 +561,11 @@ class FirebaseMessagingHandlerNotificationService
   }
 
   @override
-  Future<void> createNotificationChannel(
-    NotificationChannelData channel,
-  ) async {
+  Future<void> createNotificationChannel(NotificationChannelData channel) async {
     try {
       if (isAndroid) {
         await _localNotifications!
-            .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin
-            >()
+            .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
             ?.createNotificationChannel(channel.toAndroidNotificationChannel());
         _logMessage('[NotificationService] Channel created: ${channel.id}');
       }
@@ -629,13 +576,10 @@ class FirebaseMessagingHandlerNotificationService
   }
 
   @override
-  Future<NotificationAppLaunchDetails?>
-  getNotificationAppLaunchDetails() async {
+  Future<NotificationAppLaunchDetails?> getNotificationAppLaunchDetails() async {
     try {
       if (isWeb) {
-        _logMessage(
-          '[NotificationService] Launch details unavailable on web platform',
-        );
+        _logMessage('[NotificationService] Launch details unavailable on web platform');
         return null;
       }
 
@@ -643,8 +587,7 @@ class FirebaseMessagingHandlerNotificationService
       // early during startup. On Android, the plugin must be initialized once
       // to capture the launch intent; do a minimal, safe initialization.
       if (_localNotifications == null) {
-        final FlutterLocalNotificationsPlugin temp =
-            FlutterLocalNotificationsPlugin();
+        final FlutterLocalNotificationsPlugin temp = FlutterLocalNotificationsPlugin();
         try {
           final InitializationSettings init = InitializationSettings(
             android: const AndroidInitializationSettings('@mipmap/ic_launcher'),
@@ -700,9 +643,7 @@ class FirebaseMessagingHandlerNotificationService
     try {
       return web_interop.getWebRuntimeDiagnostics();
     } catch (error, stack) {
-      _logMessage(
-        '[NotificationService] Web runtime diagnostics error: $error',
-      );
+      _logMessage('[NotificationService] Web runtime diagnostics error: $error');
       _logMessage('[NotificationService] Stack trace: $stack');
       return <String, dynamic>{'supported': false, 'error': error.toString()};
     }
@@ -718,9 +659,7 @@ class FirebaseMessagingHandlerNotificationService
     } on UnimplementedError {
       return false;
     } catch (error, stack) {
-      _logMessage(
-        '[NotificationService] Open notification settings error: $error',
-      );
+      _logMessage('[NotificationService] Open notification settings error: $error');
       _logMessage('[NotificationService] Stack trace: $stack');
       return false;
     }
@@ -733,9 +672,7 @@ class FirebaseMessagingHandlerNotificationService
       final FlutterLocalNotificationsPlugin plugin =
           _localNotifications ?? FlutterLocalNotificationsPlugin();
       return await plugin
-          .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin
-          >()
+          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
           ?.canScheduleExactNotifications();
     } catch (error, stack) {
       _logMessage('[NotificationService] Exact alarm check error: $error');
@@ -751,9 +688,7 @@ class FirebaseMessagingHandlerNotificationService
       final FlutterLocalNotificationsPlugin plugin =
           _localNotifications ?? FlutterLocalNotificationsPlugin();
       return await plugin
-              .resolvePlatformSpecificImplementation<
-                AndroidFlutterLocalNotificationsPlugin
-              >()
+              .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
               ?.requestExactAlarmsPermission() ??
           false;
     } catch (error, stack) {
@@ -825,9 +760,7 @@ class FirebaseMessagingHandlerNotificationService
         await _updateBadgeCount(count);
       }
     } catch (error, stack) {
-      _logMessage(
-        '[NotificationService] Set Android badge count error: $error',
-      );
+      _logMessage('[NotificationService] Set Android badge count error: $error');
       _logMessage('[NotificationService] Stack trace: $stack');
     }
   }
@@ -839,9 +772,7 @@ class FirebaseMessagingHandlerNotificationService
         return await _getStoredBadgeCount();
       }
     } catch (error, stack) {
-      _logMessage(
-        '[NotificationService] Get Android badge count error: $error',
-      );
+      _logMessage('[NotificationService] Get Android badge count error: $error');
       _logMessage('[NotificationService] Stack trace: $stack');
     }
     return null;
@@ -851,17 +782,13 @@ class FirebaseMessagingHandlerNotificationService
   Future<void> clearBadgeCount() async {
     try {
       if (isWeb) {
-        _logMessage(
-          '[NotificationService] Badge count clearing not supported on web',
-        );
+        _logMessage('[NotificationService] Badge count clearing not supported on web');
         return;
       }
 
       final bool supported = await isBadgeSupported();
       if (!supported) {
-        _logMessage(
-          '[NotificationService] Badge count clearing not supported on this platform',
-        );
+        _logMessage('[NotificationService] Badge count clearing not supported on this platform');
         return;
       }
 
@@ -878,18 +805,14 @@ class FirebaseMessagingHandlerNotificationService
 
   Future<bool> _updateBadgeCount(int count) async {
     if (isWeb) {
-      _logMessage(
-        '[NotificationService] Badge updates are not available on web',
-      );
+      _logMessage('[NotificationService] Badge updates are not available on web');
       return false;
     }
 
     try {
       final bool supported = await isBadgeSupported();
       if (!supported) {
-        _logMessage(
-          '[NotificationService] App badges not supported on current platform',
-        );
+        _logMessage('[NotificationService] App badges not supported on current platform');
         return false;
       }
 
@@ -962,10 +885,7 @@ class FirebaseMessagingHandlerNotificationService
     }
   }
 
-  tz.TZDateTime _normalizeScheduledDate(
-    DateTime initial,
-    RepeatIntervalEnum repeatInterval,
-  ) {
+  tz.TZDateTime _normalizeScheduledDate(DateTime initial, RepeatIntervalEnum repeatInterval) {
     tz.TZDateTime scheduled = tz.TZDateTime.from(initial, tz.local);
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
     while (scheduled.isBefore(now)) {
@@ -977,10 +897,7 @@ class FirebaseMessagingHandlerNotificationService
     return scheduled;
   }
 
-  tz.TZDateTime _incrementScheduledDate(
-    tz.TZDateTime date,
-    RepeatIntervalEnum repeatInterval,
-  ) {
+  tz.TZDateTime _incrementScheduledDate(tz.TZDateTime date, RepeatIntervalEnum repeatInterval) {
     switch (repeatInterval) {
       case RepeatIntervalEnum.daily:
         return date.add(const Duration(days: 1));
@@ -1013,9 +930,7 @@ class FirebaseMessagingHandlerNotificationService
     }
   }
 
-  DateTimeComponents? _mapRepeatIntervalToDateTimeComponents(
-    RepeatIntervalEnum repeatInterval,
-  ) {
+  DateTimeComponents? _mapRepeatIntervalToDateTimeComponents(RepeatIntervalEnum repeatInterval) {
     switch (repeatInterval) {
       case RepeatIntervalEnum.daily:
         return DateTimeComponents.time;
@@ -1033,9 +948,7 @@ class FirebaseMessagingHandlerNotificationService
   Future<void> _createAndroidChannel(NotificationChannelData channel) async {
     try {
       await _localNotifications!
-          .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin
-          >()
+          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
           ?.createNotificationChannel(channel.toAndroidNotificationChannel());
     } catch (error, stack) {
       _logMessage('[NotificationService] Create Android channel error: $error');
@@ -1075,20 +988,15 @@ class FirebaseMessagingHandlerNotificationService
     }
   }
 
-  DarwinNotificationCategory _toDarwinCategory(
-    NotificationActionCategory category,
-  ) {
+  DarwinNotificationCategory _toDarwinCategory(NotificationActionCategory category) {
     return DarwinNotificationCategory(
       category.id,
       actions: category.actions.map((NotificationAction action) {
-        final Set<DarwinNotificationActionOption> options =
-            <DarwinNotificationActionOption>{
-              if (action.destructive)
-                DarwinNotificationActionOption.destructive,
-              if (action.foreground) DarwinNotificationActionOption.foreground,
-              if (action.requiresAuthentication)
-                DarwinNotificationActionOption.authenticationRequired,
-            };
+        final Set<DarwinNotificationActionOption> options = <DarwinNotificationActionOption>{
+          if (action.destructive) DarwinNotificationActionOption.destructive,
+          if (action.foreground) DarwinNotificationActionOption.foreground,
+          if (action.requiresAuthentication) DarwinNotificationActionOption.authenticationRequired,
+        };
         if (action.textInput) {
           return DarwinNotificationAction.text(
             action.id,
@@ -1098,11 +1006,7 @@ class FirebaseMessagingHandlerNotificationService
             options: options,
           );
         }
-        return DarwinNotificationAction.plain(
-          action.id,
-          action.title,
-          options: options,
-        );
+        return DarwinNotificationAction.plain(action.id, action.title, options: options);
       }).toList(),
     );
   }
@@ -1121,8 +1025,7 @@ class FirebaseMessagingHandlerNotificationService
     }
 
     try {
-      final TimezoneInfo timeZoneInfo =
-          await FlutterTimezone.getLocalTimezone();
+      final TimezoneInfo timeZoneInfo = await FlutterTimezone.getLocalTimezone();
       final String identifier = timeZoneInfo.identifier.trim();
       if (identifier.isNotEmpty) {
         tz.setLocalLocation(tz.getLocation(identifier));
@@ -1149,14 +1052,11 @@ class FirebaseMessagingHandlerNotificationService
   }) async {
     try {
       final bool selectedNotification =
-          response.notificationResponseType ==
-          NotificationResponseType.selectedNotification;
+          response.notificationResponseType == NotificationResponseType.selectedNotification;
       final bool selectedAction =
-          response.notificationResponseType ==
-          NotificationResponseType.selectedNotificationAction;
+          response.notificationResponseType == NotificationResponseType.selectedNotificationAction;
       final bool dismissed =
-          response.notificationResponseType ==
-          NotificationResponseType.notificationDismissed;
+          response.notificationResponseType == NotificationResponseType.notificationDismissed;
       if (dismissed) {
         if (lifecycle == NotificationLifecycle.background) {
           await _storePendingInteraction(<String, dynamic>{
@@ -1178,9 +1078,7 @@ class FirebaseMessagingHandlerNotificationService
         return;
       }
       if (selectedNotification || selectedAction) {
-        _logMessage(
-          '[NotificationService] Notification response received: ${response.id}',
-        );
+        _logMessage('[NotificationService] Notification response received: ${response.id}');
 
         // Forward to click stream so foreground taps are published consistently
         final String? rawPayload = response.payload;
@@ -1209,9 +1107,7 @@ class FirebaseMessagingHandlerNotificationService
                 ? NotificationDeliveryEventType.actionSelected.name
                 : NotificationDeliveryEventType.opened.name,
             'messageId':
-                payload['messageId']?.toString() ??
-                response.id?.toString() ??
-                'local_notification',
+                payload['messageId']?.toString() ?? response.id?.toString() ?? 'local_notification',
             'actionId': response.actionId,
             'actionInput': response.input,
             'payload': payload,
@@ -1227,9 +1123,7 @@ class FirebaseMessagingHandlerNotificationService
                 : NotificationDeliveryEventType.opened,
             surface: NotificationDeliverySurface.local,
             messageId:
-                payload['messageId']?.toString() ??
-                response.id?.toString() ??
-                'local_notification',
+                payload['messageId']?.toString() ?? response.id?.toString() ?? 'local_notification',
             timestamp: DateTime.now(),
             lifecycle: lifecycle,
             categoryId: payload['category']?.toString(),
@@ -1254,14 +1148,10 @@ class FirebaseMessagingHandlerNotificationService
     }
   }
 
-  Future<void> _storePendingInteraction(
-    Map<String, dynamic> interaction,
-  ) async {
+  Future<void> _storePendingInteraction(Map<String, dynamic> interaction) async {
     const String key = 'fmh_v2_pending_interactions';
     final Object? raw = await _backgroundStateStore.read(key);
-    final List<dynamic> pending = raw is List
-        ? List<dynamic>.from(raw)
-        : <dynamic>[];
+    final List<dynamic> pending = raw is List ? List<dynamic>.from(raw) : <dynamic>[];
     pending.add(interaction);
     if (pending.length > 100) {
       pending.removeRange(0, pending.length - 100);
