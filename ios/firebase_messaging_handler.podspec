@@ -13,7 +13,7 @@ Production-ready Flutter plugin for Firebase Cloud Messaging with a unified clic
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'A Few Good Coders' => 'dev@afewgoodcoders.com' }
   s.source           = { :path => '.' }
-  s.source_files = 'Classes/**/*'
+  s.source_files = 'firebase_messaging_handler/Sources/firebase_messaging_handler/**/*'
   s.dependency 'Flutter'
   s.platform = :ios, '13.0'
 

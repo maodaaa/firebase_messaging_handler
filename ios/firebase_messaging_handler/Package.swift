@@ -20,7 +20,7 @@ let package = Package(
             dependencies: [
                 .product(name: "FlutterFramework", package: "FlutterFramework"),
             ],
-            path: "Classes"
+            path: "Sources/firebase_messaging_handler"
         ),
     ]
 )
