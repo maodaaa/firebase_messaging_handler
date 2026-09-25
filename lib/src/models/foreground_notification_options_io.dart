@@ -27,15 +27,11 @@ class ForegroundNotificationContext {
 
 /// Builds Android foreground notification details dynamically for a message.
 typedef AndroidForegroundNotificationBuilder =
-    FutureOr<AndroidNotificationDetails?> Function(
-      ForegroundNotificationContext context,
-    );
+    FutureOr<AndroidNotificationDetails?> Function(ForegroundNotificationContext context);
 
 /// Builds iOS foreground notification details dynamically for a message.
 typedef IOSForegroundNotificationBuilder =
-    FutureOr<DarwinNotificationDetails?> Function(
-      ForegroundNotificationContext context,
-    );
+    FutureOr<DarwinNotificationDetails?> Function(ForegroundNotificationContext context);
 
 /// Controls how foreground remote messages are translated into local
 /// notifications when the app is active.
@@ -73,24 +69,24 @@ class ForegroundNotificationOptions {
   });
 
   /// Sensible defaults for heads-up style foreground presentation.
-  static const ForegroundNotificationOptions defaults =
-      ForegroundNotificationOptions(
-        enabled: true,
-        androidDefaults: AndroidNotificationDetails(
-          'default_channel',
-          'Default Notifications',
-          channelDescription:
-              'Default notification channel for foreground messages',
-          importance: Importance.max,
-          priority: Priority.high,
-          showWhen: true,
-          enableVibration: true,
-          playSound: true,
-        ),
-        iosDefaults: DarwinNotificationDetails(
-          presentAlert: true,
-          presentSound: true,
-          presentBadge: true,
-        ),
-      );
+  static const ForegroundNotificationOptions defaults = ForegroundNotificationOptions(
+    enabled: true,
+    androidDefaults: AndroidNotificationDetails(
+      'default_channel',
+      'Default Notifications',
+      channelDescription: 'Default notification channel for foreground messages',
+      importance: Importance.max,
+      priority: Priority.high,
+      showWhen: true,
+      enableVibration: true,
+      playSound: true,
+    ),
+    iosDefaults: DarwinNotificationDetails(
+      presentAlert: true,
+      presentSound: true,
+      presentBadge: true,
+      presentBanner: true,
+      presentList: true,
+    ),
+  );
 }

@@ -149,10 +149,15 @@ class NotificationManager {
       // Configure iOS foreground notification presentation options
       // Enable automatic notifications for iOS since flutter_local_notifications
       // doesn't show notifications when app is in foreground on iOS
+      final bool enableIosSystemForeground =
+          configuration.enableForegroundMessageHandling &&
+          _foregroundOptions.iosBuilder == null &&
+          _foregroundOptions.iosSoundFileName == null;
+
       await _fcmService.setForegroundNotificationPresentationOptions(
-        alert: false,
-        badge: false,
-        sound: false,
+        alert: enableIosSystemForeground,
+        badge: configuration.showBadgeByDefault,
+        sound: enableIosSystemForeground && configuration.enableSoundByDefault,
       );
 
       // Handle FCM token
@@ -1722,7 +1727,14 @@ class NotificationManager {
             androidNotificationIconPath,
           );
         } else if (isIOS) {
-          await _showIOSNotification(message);
+          if (_foregroundOptions.iosBuilder != null ||
+              _foregroundOptions.iosSoundFileName != null) {
+            await _showIOSNotification(message);
+          } else {
+            _logMessage(
+              '[NotificationManager] iOS foreground notification handled by system',
+            );
+          }
         } else {
           // Web platform
           await _showWebNotification(message);
@@ -1757,6 +1769,8 @@ class NotificationManager {
         presentAlert: details?.presentAlert ?? true,
         presentBadge: details?.presentBadge ?? true,
         presentSound: details?.presentSound ?? true,
+        presentBanner: details?.presentBanner ?? true,
+        presentList: details?.presentList ?? true,
         sound: _foregroundOptions.iosSoundFileName,
         categoryIdentifier: details?.categoryIdentifier ?? message.category,
         threadIdentifier: details?.threadIdentifier,

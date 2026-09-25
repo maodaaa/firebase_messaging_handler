@@ -185,6 +185,8 @@ class FirebaseMessagingHandlerNotificationService implements NotificationService
               presentAlert: true,
               presentSound: true,
               presentBadge: true,
+              presentBanner: true,
+              presentList: true,
               categoryIdentifier: category,
               threadIdentifier: threadIdentifier,
               subtitle: groupAlertSummary,
@@ -249,6 +251,8 @@ class FirebaseMessagingHandlerNotificationService implements NotificationService
             presentAlert: true,
             presentSound: true,
             presentBadge: false,
+            presentBanner: true,
+            presentList: true,
           ),
         ),
         payload: jsonEncode({
@@ -303,6 +307,8 @@ class FirebaseMessagingHandlerNotificationService implements NotificationService
           presentAlert: true,
           presentSound: true,
           presentBadge: false,
+          presentBanner: true,
+          presentList: true,
           categoryIdentifier: actionCategoryId,
         ),
       );
@@ -358,6 +364,8 @@ class FirebaseMessagingHandlerNotificationService implements NotificationService
           presentAlert: true,
           presentSound: true,
           presentBadge: false,
+          presentBanner: true,
+          presentList: true,
         ),
       );
 
